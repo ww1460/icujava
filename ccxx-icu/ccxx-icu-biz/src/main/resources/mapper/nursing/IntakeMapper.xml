@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nursing.IntakeMapper">
+
+	<resultMap id="IntakeOutputRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.IntakeOutputRecord">
+		<id property="id" column="id"/>
+		<result property="intakeOutputId" column="intake_output_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="intakeOutputType" column="intake_output_type"/>
+		<result property="intakeOutputValue" column="intake_output_value"/>
+		<result property="equilibriumAmount" column="equilibrium_amount "/>
+		<result property="valueDescription" column="value_description"/>
+		<result property="causeRemark" column="cause_remark"/>
+		<result property="source" column="source"/>
+		<result property="sourceId" column="source_id"/>
+		<result property="remarks" column="remarks"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+
+	<sql id="Map_List">
+
+	id,intake_output_id,patient_id,project_id,intake_output_type,intake_output_value,equilibrium_amount,value_description,
+	cause_remark,source_id,remarks,dept_id,del_flag,del_user_id,del_time,update_time,update_user_id,create_user_id,
+	create_time
+</sql>
+
+
+	<select id="selectEquilibriumAmount" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.IntakeOutputShow"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo" >
+
+		SELECT
+		ior.id,
+		ior.intake_output_id,
+		ior.patient_id,
+		ior.project_id,
+		ior.cause_remark,
+		ior.intake_output_type,
+		ior.intake_output_value,
+		ior.equilibrium_amount,
+		ior.create_time,
+		hour(ior.create_time) as hour
+		FROM
+		nur_intake_output_record ior
+		WHERE
+		ior.del_flag = 0
+		AND ior.patient_id = #{patientId}
+		<if test="startTime != null">
+			and date_format(
+			ior.create_time,
+			'%Y-%m-%d %H'
+			) >= date_format(
+			#{startTime},
+			'%Y-%m-%d %H'
+			)
+		</if>
+		<if test="endTime != null">
+			AND date_format(
+			#{endTime},
+			'%Y-%m-%d %H'
+			) >= date_format(
+			ior.create_time,
+			'%Y-%m-%d %H'
+			)
+		</if>
+		ORDER BY
+		ior.create_time DESC
+
+	</select>
+
+
+	<!--出入量分页查询-->
+	<select id="selectByPage" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.IntakeOutputVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.IntakeOutPutBo">
+
+		SELECT
+		ior.id,
+		ior.intake_output_id,
+		ior.dept_id,
+		ior.intake_output_type,
+		ior.intake_output_value,
+		ior.patient_id,
+		ior.equilibrium_amount,
+		ior.project_id,
+		ior.value_description,
+		ior.create_time,
+		hb.bed_code,
+		pl.project_name,
+		p.`name` AS patientName,
+		n.real_name AS createName
+		FROM
+		nur_intake_output_record ior
+		LEFT JOIN nur_project pl ON pl.project_id = ior.project_id
+		LEFT JOIN pat_patient p ON p.patient_id = ior.patient_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = ior.create_user_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = ior.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		WHERE
+		ior.del_flag = 0
+		<if test="query.deptId != null">
+			and ior.dept_id = #{query.deptId}
+		</if>
+		<if test="query.patientId != null and query.patientId != ''">
+			and
+			ior.patient_id= #{query.patientId}
+		</if>
+		<if test="query.range == 0 and (query.patientId == null or query.patientId =='') and query.nurseId != null and query.nurseId != ''">
+			and ior.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.nurseId}
+			)
+		</if>
+		<if test="query.projectName != null and query.projectName != ''">
+			and
+			pl.project_name like CONCAT('%',#{query.projectName},'%')
+		</if>
+		<if test="query.patientName != null and query.patientName != '' ">
+			and
+			p.name like CONCAT('%',#{query.patientName},'%')
+		</if>
+		<if test="query.nurseId != null and query.range == 1">
+			and
+			ior.create_user_id = #{query.nurseId}
+		</if>
+		<if test="query.startTime != null">
+			and date_format(
+			ior.create_time,
+			'%Y-%m-%d'
+			) >= date_format(
+			#{query.startTime},
+			'%Y-%m-%d'
+			)
+		</if>
+		<if test="query.endTime != null">
+			AND date_format(
+			#{query.endTime},
+			'%Y-%m-%d'
+			) >= date_format(
+			ior.create_time,
+			'%Y-%m-%d'
+			)
+		</if>
+
+
+		order by ior.create_time desc
+
+
+	</select>
+
+	<!--获取出入量进行展示-->
+	<select id="getDateShow" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.IntakeOutputShow"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		SELECT
+		ior.id,
+		ior.intake_output_id,
+		ior.patient_id,
+		ior.project_id,
+		ior.cause_remark,
+		ior.remarks,
+		pl.project_name,
+		ior.intake_output_type,
+		ior.intake_output_value,
+		ior.value_description,
+		n.real_name as createName,
+		n.signature,
+		ior.create_user_id,
+		ior.equilibrium_amount,
+		ior.create_time,
+		hour(ior.create_time) as hour
+		FROM
+		nur_intake_output_record ior
+		LEFT JOIN nur_project pl ON pl.project_id = ior.project_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = ior.create_user_id
+		WHERE
+		ior.del_flag = 0
+		AND ior.patient_id = #{patientId}
+		<if test="startTime != null">
+			and date_format(
+			ior.create_time,
+			'%Y-%m-%d %H'
+			) >= date_format(
+			#{startTime},
+			'%Y-%m-%d %H'
+			)
+		</if>
+		<if test="endTime != null">
+			AND date_format(
+			#{endTime},
+			'%Y-%m-%d %H'
+			) >= date_format(
+			ior.create_time,
+			'%Y-%m-%d %H'
+			)
+		</if>
+		ORDER BY
+		ior.create_time DESC
+
+	</select>
+
+
+	<!--获取最新的平衡量-->
+	<select id="getEquilibriumAmount" resultType="java.lang.Integer"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+			sum(intake_output_value)
+		from
+			nur_intake_output_record
+		where
+			del_flag = 0
+		<if test="patientId != null">
+			and
+			patient_id = #{patientId}
+		</if>
+		<if test="startTime != null ">
+			and date_format(create_time,'%Y-%m-%d %H')>= date_format(#{startTime},'%Y-%m-%d %H')
+		</if>
+		<if test="endTime !=null ">
+			and #{endTime} >= create_time
+		</if>
+
+	</select>
+
+	<!--查询某患者 某数据后的数据-->
+	<select id="selectAfter" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.IntakeOutputRecord"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.IntakeOutputRecord">
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_intake_output_record
+		where
+		del_flag = 0
+		<if test="patientId != null">
+			and
+			patient_id = #{patientId}
+		</if>
+		<if test="id != null">
+			and id > #{id}
+		</if>
+		<if test="createTime !=null ">
+			and date_format(create_time,'%Y-%m-%d')= date_format(#{createTime},'%Y-%m-%d')
+		</if>
+		order by id asc
+
+	</select>
+
+	<select id="selectCorrelationValue" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.IntakeOutputRecord"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.IntakeOutputRecord">
+		select
+		<include refid="Map_List"/>
+		from
+		nur_intake_output_record
+		where
+		del_flag = 0
+		<if test="patientId != null">
+			and
+			patient_id = #{patientId}
+		</if>
+		and
+		source_id = #{sourceId}
+		and
+		project_id = #{projectId}
+	</select>
+
+	<!--按时间段查询出入量的合计值-->
+	<select id="getCounts" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.IntakeRemarksVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		SELECT
+			p.project_id,
+			p.project_name,
+			p.project_code,
+			p.project_type as intakeOutputType,
+			SUM(ior.intake_output_value) as countNum,
+			ior.remarks
+		FROM
+			nur_project p
+		LEFT JOIN nur_intake_output_record ior ON ior.project_id = p.project_id
+		AND ior.del_flag = 0
+		AND ior.patient_id = #{patientId}
+
+		<if test="startTime != null">
+			and date_format(
+			ior.create_time,
+			'%Y-%m-%d %H'
+			) >= date_format(
+			#{startTime},
+			'%Y-%m-%d %H'
+			)
+		</if>
+		<if test="endTime != null">
+			AND date_format(
+			#{endTime},
+			'%Y-%m-%d %H'
+			) >= date_format(
+			ior.create_time,
+			'%Y-%m-%d %H'
+			)
+		</if>
+		WHERE
+			p.del_flag = 0
+		and p.dept_id = #{deptId}
+		AND (
+			p.project_type = 2
+			OR p.project_type = 3
+		)
+
+		GROUP BY
+			ior.remarks,p.project_id
+		order by p.id desc
+
+	</select>
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.NurseMapper">
+
+	<resultMap id="NurseMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.Nurse">
+		<id property="id" column="id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="hisNurseId" column="his_nurse_id"/>
+		<result property="roleFlag" column="role_flag"/>
+		<result property="nurseGrade" column="nurse_grade"/>
+		<result property="nurseRfid" column="nurse_rfid"/>
+		<result property="realName" column="real_name"/>
+		<result property="gender" column="gender"/>
+		<result property="motto" column="motto"/>
+		<result property="signature" column="signature"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+	<sql id="nurseList">
+
+	id,nurse_id,user_id,nurse_grade,his_nurse_id,dept_id,nurse_rfid,signature,motto,role_flag,real_name,gender,create_user_id,create_time,update_user_id,
+	update_time,del_flag,del_time,del_user_id
+
+</sql>
+
+	<select id="selectByUserId" parameterType="java.lang.String" resultMap="NurseMap">
+
+		select
+		<include refid="nurseList"/>
+		from nur_nurse
+		where
+		user_id = #{userId}
+		and del_flag = 0
+
+	</select>
+
+	<select id="selectByGrade" parameterType="java.lang.Integer" resultMap="NurseMap">
+
+		select
+		<include refid="nurseList"/>
+		from nur_nurse
+		where
+		nurse_grade = #{nurseGrade}
+		and del_flag = 0
+		order by create_time desc
+	</select>
+
+	<!--根据科室查询护士(不包括护士长)-->
+	<select id="selectByDept" parameterType="java.lang.String"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.Nurse">
+
+		select
+		<include refid="nurseList"/>
+		from nur_nurse
+		where
+		del_flag = 0
+		and role_flag = 0
+		<if test="deptId !=null">
+			and dept_Id = #{deptId}
+		</if>
+		order by create_time desc
+	</select>
+
+
+	<!--根据科室查询护士-->
+	<select id="selectAllNurse" parameterType="java.lang.String"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.Nurse">
+
+		select
+		<include refid="nurseList"/>
+		from nur_nurse
+		where
+		del_flag = 0
+		<if test="deptId !=null">
+			and dept_Id = #{deptId}
+		</if>
+		order by create_time desc
+	</select>
+
+	<!--  -->
+	<select id="selectNurseUserIdByRfid" parameterType="java.util.List" resultMap="NurseMap">
+
+		select
+		<include refid="nurseList"/>
+		from nur_nurse
+		where
+		del_flag = 0
+		and nurse_rfid in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item, jdbcType=VARCHAR}
+		</foreach>
+
+	</select>
+	<!--非责任护士-->
+	<select id="getPatientNurse" resultMap="NurseMap">
+		select
+		<include refid="List_Map"/>
+		from nur_nurse n
+		left join nur_nurse_patient_correlation npc on npc.nurse_id = n.nurse_id
+		where
+		 del_flag = 0
+		and npc.patient_id = #{patientId}
+		and npc.only_duty_nurse = 1
+	</select>
+
+	<sql id="List_Map">
+	n.id,n.nurse_id,n.user_id,n.nurse_grade,n.his_nurse_id,n.dept_id,n.motto,n.signature,n.nurse_rfid,n.role_flag,n.real_name,n.gender,n.create_user_id,
+	n.create_time,n.update_user_id,	n.update_time,n.del_flag,n.del_time,n.del_user_id
+	</sql>
+
+	<!--根据科室查询护士-->
+	<select id="selectAllNurseNumber" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.Nurse">
+		select
+		*
+		from nur_nurse
+		where
+		del_flag = 0
+	</select>
+
+</mapper>

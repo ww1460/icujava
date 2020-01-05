@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.NursingOccupationalExposureMapper">
+
+	<resultMap id="NursingOccupationalExposureMap"
+			   type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.NursingOccupationalExposure">
+		<id property="id" column="id"/>
+		<result property="occupationalExposureId" column="occupational_exposure_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="nurseName" column="nurse_name"/>
+		<result property="nurseSex" column="nurse_sex"/>
+		<result property="nurseAge" column="nurse_age"/>
+		<result property="nurseProfession" column="nurse_profession"/>
+		<result property="nurseDept" column="nurse_dept"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="occurrenceSite" column="occurrence_site"/>
+		<result property="occurrenceProcess" column="occurrence_process"/>
+		<result property="occurrenceReason" column="occurrence_reason"/>
+		<result property="personalProtection" column="personal_protection"/>
+		<result property="exposureSkin" column="exposure_skin"/>
+		<result property="exposureMucosa" column="exposure_mucosa"/>
+		<result property="exposurePart" column="exposure_part"/>
+		<result property="exposureArea" column="exposure_area"/>
+		<result property="contaminantSource" column="contaminant_source"/>
+		<result property="applianceKind" column="appliance_kind"/>
+		<result property="applianceModelNumber" column="appliance_model_number"/>
+		<result property="injuryDegreeAndRisk" column="injury_degree_and_risk"/>
+		<result property="applianceContaminantSource" column="appliance_contaminant_source"/>
+		<result property="injuryWay" column="injury_way"/>
+		<result property="breakageAndBleeding" column="breakage_and_bleeding"/>
+		<result property="labBlood" column="lab_blood"/>
+		<result property="labBodyFluidKind" column="lab_body_fluid_kind"/>
+		<result property="labOther" column="lab_other"/>
+		<result property="labVirusContent" column="lab_virus_content"/>
+		<result property="labOtherCondition" column="lab_other_condition"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="patientAge" column="patient_age"/>
+		<result property="patientSex" column="patient_sex"/>
+		<result property="patientConfirmedTime" column="patient_Confirmed_time"/>
+		<result property="patientIllness" column="patient_illness"/>
+		<result property="viralLoad" column="viral_load"/>
+		<result property="preparerName" column="preparer_name"/>
+		<result property="cellCounting" column="cell_counting"/>
+		<result property="preparerPhone" column="preparer_phone"/>
+		<result property="preparerTime" column="preparer_time"/>
+		<result property="reviewTime" column="review_time"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

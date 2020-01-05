@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.assess.EntranceAssessRecordMapper">
+
+  <resultMap id="EntranceAssessRecordMap"
+			 type="com.pig4cloud.pigx.ccxxicu.api.entity.assess.EntranceAssessRecord">
+                  <id property="id" column="id"/>
+                        <result property="entranceAssessRecordId" column="entrance_assess_record_id"/>
+                        <result property="entranceTime" column="entrance_time"/>
+                        <result property="entranceDiagnose" column="entrance_diagnose"/>
+                        <result property="entrancePathway" column="entrance_pathway"/>
+                        <result property="patientPhone" column="patient_phone"/>
+                        <result property="patientAddress" column="patient_address"/>
+                        <result property="dataSource" column="data_source"/>
+                        <result property="dataSourceRemarks" column="data_source_remarks"/>
+                        <result property="previousHistory" column="previous_history"/>
+                        <result property="previousHistoryRemarks" column="previous_history_remarks"/>
+                        <result property="familyHistory" column="family_history"/>
+                        <result property="familyHistoryRemarks" column="family_history_remarks"/>
+                        <result property="drugAllergy" column="drug_allergy"/>
+                        <result property="drugAllergyRemarks" column="drug_allergy_remarks"/>
+                        <result property="allergenicFood" column="allergenic_food"/>
+                        <result property="allergenicFoodRemarks" column="allergenic_food_remarks"/>
+                        <result property="otherAllergens" column="other_allergens"/>
+                        <result property="otherAllergensRemarks" column="other_allergens_remarks"/>
+                        <result property="skinCase" column="skin_case"/>
+                        <result property="skinCaseRemarks" column="skin_case_remarks"/>
+                        <result property="communicationBarriers" column="communication_barriers"/>
+                        <result property="communicationBarriersRemarks" column="communication_barriers_remarks"/>
+                        <result property="treatmentCompliance" column="treatment_compliance"/>
+                        <result property="patientNation" column="patient_nation"/>
+                        <result property="patientProfession" column="patient_profession"/>
+                        <result property="patientCulture" column="patient_culture"/>
+                        <result property="patientMarriage" column="patient_marriage"/>
+                        <result property="patientDwellingState" column="patient_dwelling_state"/>
+                        <result property="patientCostSource" column="patient_cost_source"/>
+                        <result property="patientEconomySource" column="patient_economy_source"/>
+                        <result property="patientReligionFaith" column="patient_religion_faith"/>
+                        <result property="patientReligionDemand" column="patient_religion_demand"/>
+                        <result property="patientReligionDemandRemarks" column="patient_religion_demand_remarks"/>
+                        <result property="patientSmoke" column="patient_smoke"/>
+                        <result property="patientSmokeRemarks" column="patient_smoke_remarks"/>
+                        <result property="patientDrink" column="patient_drink"/>
+                        <result property="patientDrinkRemarks" column="patient_drink_remarks"/>
+                        <result property="specialCrowd" column="special_crowd"/>
+                        <result property="specialCrowdRemarks" column="special_crowd_remarks"/>
+                        <result property="socialSupport" column="social_support"/>
+                        <result property="socialSupportRemarks" column="social_support_remarks"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="updateUserId" column="update_user_id"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.NursingTaskRelationMapper">
+
+		<!-- 条件数据全查 -->
+	<select id="selectAll" resultMap="takNursingTaskRelationMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.NursingTaskRelation">
+			select
+			r.id,
+			r.project_type,
+			r.`code`,
+			r.project_type,
+			r.tak_template_id,
+			r.project_id,
+			t.template_content as template_conten,
+			t.template_describe as template_describe,
+			t.template_id as t_template_id,
+			t.source_id as t_source_id
+			 from tak_nursing_task_relation r
+			left join tak_template t on r.tak_template_id = t.template_id
+			<where>
+			  and t.template_content is not null
+				<if test="test.deptId">
+					and r.dept_Id = #{test.deptId}
+				</if>
+				<if test="test.projectId !=null">
+					and r.project_id = #{test.projectId}
+				</if>
+			</where>
+
+
+		</select>
+
+		<!-- 分页数据全查 -->
+	<select id="selectPaging" resultMap="takNursingTaskRelationMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.NursingTaskRelation">
+			select
+			r.id,
+			r.project_type,
+			r.`code`,
+			r.project_type,
+			r.project_id,
+			r.tak_template_id,
+			t.template_content as template_conten,
+			t.template_describe as template_describe
+			 from tak_nursing_task_relation r
+			left join tak_template t on r.tak_template_id = t.template_id
+			where
+			  t.template_content is not null
+		</select>
+
+	<!-- 通过任务id查询数据 -->
+	<select id="takTemplateId" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.task.NursingTaskRelation" parameterType="java.lang.String">
+			select * from tak_nursing_task_relation where tak_template_id = #{takTemplateId}
+	</select>
+
+
+	<resultMap id="takNursingTaskRelationMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.NursingTaskRelationVo">
+		<id property="id" column="id"/>
+		<result property="code" column="code"/>
+		<result property="name" column="name"/>
+		<result property="projectType" column="project_type"/>
+		<result property="takTemplateId" column="tak_template_id"/>
+		<result property="projectId" column="project_id"/>
+
+		<result property="templateContent" column="template_conten"/>
+		<result property="templateDescribe" column="template_describe"/>
+		<result property="taskResult" column="t_resule"/>
+		<result property="templateId" column="t_template_id"/>
+		<result property="sourceItemsId" column="t_source_items_id"/>
+	</resultMap>
+
+
+
+
+  <resultMap id="takNursingTaskRelationMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.NursingTaskRelation">
+                  <id property="id" column="id"/>
+                        <result property="code" column="code"/>
+                        <result property="name" column="name"/>
+                        <result property="projectType" column="project_type"/>
+                        <result property="takTemplateId" column="tak_template_id"/>
+	 					 <result property="projectId" column="project_id"/>
+	  					<result property="deptId" column="dept_id"/>
+
+
+            </resultMap>
+</mapper>

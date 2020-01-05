@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.NursePatientRecordMapper">
+
+
+
+	<!-- 分页查询所有数据 -->
+	<select id="selectPaging" resultMap="nurNursePatientRecordMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.NursePatientRecord">
+		select
+		r.id,
+		r.nurse_id,
+		r.patient_id,
+		r.start_time,
+		r.end_time,
+		r.total_time,
+		r.founder,
+		r.dept_id,
+		r.del_flag,
+		r.only_duty_nurse,
+		n.real_name as nrealname,
+		p.`name` as pname
+		from nur_nurse_patient_record r
+		left join nur_nurse n on r.nurse_id = n.nurse_id
+		left join pat_patient p on r.patient_id = p.patient_id
+		<where>
+			r.del_flag =0 and p.entry_state = 2
+			<if test="nursePatientRecord.deptId">
+				and r.dept_id = #{nursePatientRecord.deptId}
+			</if>
+			<if test="nursePatientRecord.nurseId">
+				and r.nurse_id = #{nursePatientRecord.nurseId}
+			</if>
+			<if test="nursePatientRecord.patientId">
+				and r.patient_id = #{nursePatientRecord.patientId}
+			</if>
+		</where>
+
+	</select>
+
+
+
+
+	<!-- 分页查询所有数据 -->
+	<select id="selectAll" resultMap="nurNursePatientRecordMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.NursePatientRecord">
+		select
+		r.id,
+		r.nurse_id,
+		r.patient_id,
+		r.start_time,
+		r.end_time,
+		r.total_time,
+		r.founder,
+		r.dept_id,
+		r.del_flag,
+		r.only_duty_nurse,
+		n.real_name as nrealname,
+		p.`name` as pname
+		from nur_nurse_patient_record r
+		left join nur_nurse n on r.nurse_id = n.nurse_id
+		left join pat_patient p on r.patient_id = p.patient_id
+		<where>
+			r.del_flag =0 and p.entry_state = 2
+			<if test="nursePatientRecord.deptId">
+				and r.dept_id = #{nursePatientRecord.deptId}
+			</if>
+			<if test="nursePatientRecord.nurseId">
+				and r.nurse_id = #{nursePatientRecord.nurseId}
+			</if>
+			<if test="nursePatientRecord.patientId">
+				and r.patient_id = #{nursePatientRecord.patientId}
+			</if>
+		</where>
+		ORDER BY r.id desc
+	</select>
+
+	<!-- 用患者id 查询当前看护患者的护士   用于出科 -->
+	<select id="currentCarePatientNurse" resultMap="currentCarePatientNurseMap" parameterType="java.lang.String">
+		select
+			id,
+			nurse_id,
+			patient_id,
+			start_time,
+			end_time,
+			del_flag
+			from nur_nurse_patient_record
+			<where>
+				end_time is null and del_flag =0
+				<if test="patientId !=null">
+					and  patient_id = #{patientId}
+				</if>
+			</where>
+	</select>
+	<resultMap id="currentCarePatientNurseMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.NursePatientRecordVo">
+		<id property="id" column="id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="totalTime" column="total_time"/>
+		<result property="founder" column="founder"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="nurseName" column="nrealname"/>
+		<result property="patientName" column="pname"/>
+		<result property="onlyDutyNurse" column="only_duty_nurse"/>
+	</resultMap>
+
+
+
+
+
+	<resultMap id="nurNursePatientRecordMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.NursePatientRecordVo">
+		<id property="id" column="id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="totalTime" column="total_time"/>
+		<result property="founder" column="founder"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="nurseName" column="nrealname"/>
+		<result property="patientName" column="pname"/>
+		<result property="onlyDutyNurse" column="only_duty_nurse"/>
+	</resultMap>
+
+
+
+  <resultMap id="nurNursePatientRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.NursePatientRecord">
+                  <id property="id" column="id"/>
+                        <result property="nurseId" column="nurse_id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="endTime" column="end_time"/>
+                        <result property="totalTime" column="total_time"/>
+                        <result property="founder" column="founder"/>
+	  					<result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+						<result property="onlyDutyNurse" column="only_duty_nurse"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

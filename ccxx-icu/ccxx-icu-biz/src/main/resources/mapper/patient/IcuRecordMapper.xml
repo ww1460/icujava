@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.IcuRecordMapper">
+
+
+	<!-- 分页查询数据 -->
+	<select id="page" resultMap="patIcuRecordMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.patient.IcuRecordVo">
+		SELECT
+		id,
+		icu_record_id,
+		new_dept_patient,
+		trachea_patient,
+		dept_patient,
+		indwelling_catheter_patient,
+		arteriovenou_patient,
+		respirator_use_patient,
+		record_time,
+		del_flag
+		 from pat_icu_record
+		<where>
+			del_flag = 0
+			<if test="icuRecord.startTime != null and icuRecord.endTime !=null">
+				and  date_format(record_time,'%Y-%m-%d') >= date_format(#{icuRecord.startTime},'%Y-%m-%d')
+				and  date_format(#{icuRecord.endTime},'%Y-%m-%d') >= date_format(record_time,'%Y-%m-%d')
+			</if>
+			<if test="icuRecord.deptId !=null">
+				and  dept_id = #{icuRecord.deptId}
+			</if>
+
+		</where>
+
+	</select>
+
+	<!-- 综合数据大屏-目录栏数据-留置导尿管，动静脉插管，呼吸机使用数 -->
+	<select id="getIcuRecordForCatalog" resultMap="patIcuRecordMap">
+		select * from pat_icu_record where record_time between current_date() and date_format(current_date,'%Y-%m-%d 23:59:59')
+	</select>
+
+  <resultMap id="patIcuRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.IcuRecord">
+                  <id property="id" column="id"/>
+                        <result property="icuRecordId" column="icu_record_id"/>
+                        <result property="newDeptPatient" column="new_dept_patient"/>
+                        <result property="deptPatient" column="dept_patient"/>
+					    <result property="tracheaPatient" column="trachea_patient"/>
+                        <result property="indwellingCatheterPatient" column="indwelling_catheter_patient"/>
+                        <result property="arteriovenouPatient" column="arteriovenou_patient"/>
+                        <result property="respiratorUsePatient" column="respirator_use_patient"/>
+                        <result property="recordTime" column="record_time"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

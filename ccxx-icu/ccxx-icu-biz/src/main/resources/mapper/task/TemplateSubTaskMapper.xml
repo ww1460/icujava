@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.TemplateSubTaskMapper">
+
+
+	<!--T通过不同来源类型展示任务模板-->
+		<select id="buildByOneself" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TemplateSubTaskVo" resultMap="takTemplateSubTaskMap">
+			SELECT
+			sub.id,
+			sub.template_sub_task_id,
+			sub.task_content,
+			sub.task_describe,
+			sub.pre_end_time,
+			sub.pre_start_time,
+			sub.interval_time,
+			sub.source,
+			sub.source_id,
+			sub.task_template_id,
+			sub.execution_type,
+			tem.purpose,
+			tem.create_user_id,
+			tem.dept_id,
+			tem.template_content as taskName
+			from tak_template_sub_task sub
+			left join tak_template tem on sub.task_template_id = tem.template_id
+			<where>
+				tem.del_flag =0 and sub.del_flag =0
+				<if test="templateSubTask.source !=null">
+					and tem.source = #{templateSubTask.source}
+				</if>
+				<if test="templateSubTask.taskName !=null">
+					and tem.template_content = #{templateSubTask.taskName}
+				</if>
+				<if test="templateSubTask.purpose !=null">
+					and tem.purpose = #{templateSubTask.purpose}
+				</if>
+				<if test="templateSubTask.loginNurse !=null">
+					and(tem.create_user_id =#{templateSubTask.loginNurse} or tem.purpose = 1)
+				</if>
+				<if test="templateSubTask.deptId !=null">
+					and tem.dept_id = #{templateSubTask.deptId}
+				</if>
+			</where>
+
+		</select>
+
+
+  <resultMap id="takTemplateSubTaskMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.TemplateSubTask">
+	  <id property="id" column="id" />
+		  <result property="templateSubTaskId" column="template_sub_task_id" />
+		  <result property="taskContent" column="task_content" />
+		  <result property="taskDescribe" column="task_describe" />
+		  <result property="preStartTime" column="pre_start_time" />
+		  <result property="preEndTime" column="pre_end_time" />
+		  <result property="intervalTime" column="interval_time" />
+		  <result property="sourceId" column="source_id" />
+		  <result property="source" column="source" />
+		  <result property="taskTemplateId" column="task_template_id" />
+		  <result property="executionType" column="execution_type" />
+		  <result property="delFlag" column="del_flag" />
+		  <result property="delTime" column="del_time" />
+		  <result property="delUserId" column="del_user_id" />
+		  <result property="createTime" column="create_time" />
+		  <result property="createUserId" column="create_user_id" />
+
+  </resultMap>
+</mapper>

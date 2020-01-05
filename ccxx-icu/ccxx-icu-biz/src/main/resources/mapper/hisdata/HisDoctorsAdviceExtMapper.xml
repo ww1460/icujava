@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.hisdata.HisDoctorsAdviceExtMapper">
+
+  <resultMap id="hisDoctorsAdviceExtMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisDoctorsAdviceExt">
+                  <id property="id" column="id"/>
+                        <result property="doctorsAdviceExtId" column="doctors_advice_ext_id"/>
+                        <result property="hisFZYExecInfoId" column="his_f_z_y_exec_info_id"/>
+	 					 <result property="hisDoctorsAdviceProjectId" column="his_doctors_advice_project_id"/>
+                        <result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+                        <result property="preExecuteTime" column="pre_execute_time"/>
+                        <result property="hisPatientId" column="his_patient_id"/>
+                        <result property="hisDeptId" column="his_dept_id"/>
+                        <result property="dosage" column="dosage"/>
+	  					<result property="company" column="company"/>
+					    <result property="hisFZYExecInfoCreateTime" column="his_f_z_y_exec_info_create_time"/>
+                        <result property="dropSpeed" column="drop_speed"/>
+                        <result property="dropNum" column="drop_num"/>
+                        <result property="executeDosage" column="executel_dosage"/>
+						<result property="executeCompany" column="executel_company"/>
+	 					<result property="hisFZYExecInfoCreateTime" column="his_f_z_y_exec_info_id_create_time"/>
+                        <result property="executeSituation" column="execute_situation"/>
+                        <result property="executeType" column="execute_type"/>
+                        <result property="executeNurse" column="execute_nurse"/>
+                        <result property="executeTime" column="execute_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="createTime" column="create_time"/>
+            </resultMap>
+</mapper>

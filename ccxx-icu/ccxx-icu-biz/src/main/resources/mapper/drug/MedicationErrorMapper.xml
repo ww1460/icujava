@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.drug.MedicationErrorMapper">
+
+	<resultMap id="MedicationErrorMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.drug.MedicationError">
+		<id property="id" column="id"/>
+		<result property="medicationErrorId" column="medication_error_id"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="discoveryTime" column="discovery_time"/>
+		<result property="errorContent" column="error_content"/>
+		<result property="errorContentRemarks" column="error_content_remarks"/>
+		<result property="whetherGivePatient" column="whether_give_patient"/>
+		<result property="whetherPatientUse" column="whether_patient_use"/>
+		<result property="medicationErrorLevel" column="medication_error_level"/>
+		<result property="patientRecover" column="patient_recover"/>
+		<result property="medicationErrorLevelRemarks" column="medication_error_level_remarks"/>
+		<result property="patientInjury" column="patient_injury"/>
+		<result property="patientInjuryRemarks" column="patient_injury_remarks"/>
+		<result property="causeOfTheError" column="cause_of_the_error"/>
+		<result property="causeOfTheErrorRemarks" column="cause_of_the_error_remarks"/>
+		<result property="occurrenceSites" column="occurrence_sites"/>
+		<result property="occurrenceSitesRemark" column="occurrence_sites_remark"/>
+		<result property="staffPosition" column="staff_position"/>
+		<result property="staffPositionRemarks" column="staff_position_remarks"/>
+		<result property="relatedPersonPosition" column="related_person_position"/>
+		<result property="relatedPersonPositionRemarks" column="related_person_position_remarks"/>
+		<result property="findErrorPerson" column="find_error_person"/>
+		<result property="findErrorPersonRemarks" column="find_error_person_remarks"/>
+		<result property="howToFind" column="how_to_find"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="patientAge" column="patient_age"/>
+		<result property="patientSex" column="patient_sex"/>
+		<result property="patientIllness" column="patient_illness"/>
+		<result property="patientPhone" column="patient_phone"/>
+		<result property="drugCommonName" column="drug_common_name"/>
+		<result property="drugTradeName" column="drug_trade_name"/>
+		<result property="drugManufacturers" column="drug_manufacturers"/>
+		<result property="drugType" column="drug_type"/>
+		<result property="drugDosageForms" column="drug_dosage_forms"/>
+		<result property="drugSpecifications" column="drug_specifications"/>
+		<result property="drugPackaging" column="drug_packaging"/>
+		<result property="drugUsageDosage" column="drug_usage_dosage"/>
+		<result property="drugTreatment" column="drug_treatment"/>
+		<result property="drugFrequency" column="drug_frequency"/>
+		<result property="whetherBringsData" column="whether_brings_data"/>
+		<result property="whetherBringsDataRemarks" column="whether_brings_data_remarks"/>
+		<result property="processOccurs" column="process_occurs"/>
+		<result property="preventionAdvice" column="prevention_advice"/>
+		<result property="preparerName" column="preparer_name"/>
+		<result property="preparerPhone" column="preparer_phone"/>
+		<result property="preparerEmail" column="preparer_email"/>
+		<result property="preparerAddress" column="preparer_address"/>
+		<result property="createTime" column="create_time"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+</mapper>

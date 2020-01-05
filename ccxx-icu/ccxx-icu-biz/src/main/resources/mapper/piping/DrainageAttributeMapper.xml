@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.piping.DrainageAttributeMapper">
+
+	<!-- 数据分页查询 -->
+	<select id="selectPaging" resultMap="DrainageAttributeMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.DrainageAttribute">
+		select
+		att.id,
+		att.drainage_attribute_id,
+		att.drainage_id,
+		att.attribute_name,
+		att.attribute_type,
+		att.normal,
+		att.measures,
+		att.measures,
+		att.dept_id,
+		att.del_flag,
+		dra.drainage_name as draname
+		from  pip_drainage_attribute att
+		left join pip_drainage dra on att.drainage_id = dra.drainage_id
+		<where>
+			att.del_flag =0
+			<if test="drainageAttribute.deptId !=null">
+			 and att.dept_id =#{drainageAttribute.deptId}
+			</if>
+			<if test="drainageAttribute.attributeName !=null">
+				and att.attribute_name =#{drainageAttribute.attributeName}
+			</if>
+		</where>
+		order by att.id desc
+	</select>
+
+<!-- 去重查询相应的属性名称数据 -->
+	<select id="distinctName" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.DrainageAttribute" resultMap="pipDrainageAttributeMap">
+
+		select distinct attribute_name from pip_drainage_attribute
+		<where>
+			del_flag =0
+			<if test="drainageAttribute.deptId !=null">
+				and  dept_id =#{drainageAttribute.deptId}
+			</if>
+			<if test="drainageAttribute.drainageId !=null">
+				and  drainage_id =#{drainageAttribute.drainageId}
+			</if>
+		</where>
+
+	</select>
+
+
+
+	<!-- 属性名称及属性类型查询 -->
+	<select id="selectNameType" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.DrainageAttribute" resultMap="pipDrainageAttributeMap">
+		select
+				id,
+				drainage_id,
+				attribute_name,
+				attribute_type,
+				dept_id,
+				del_flag,
+			  	normal,
+				measures
+		from  pip_drainage_attribute
+
+		<where>
+			del_flag =0
+			<if test="drainageAttribute.attributeName !=null">
+				and  attribute_name =#{drainageAttribute.attributeName}
+			</if>
+			<if test="drainageAttribute.drainageId !=null">
+				and  drainage_id =#{drainageAttribute.drainageId}
+			</if>
+		</where>
+		order by id desc
+	</select>
+
+	<!--通过引流液id  查询相关属性-->
+	<select id="drainageId" parameterType="java.lang.Integer" resultMap="DrainageAttributeMapVo">
+		select
+		att.id,
+		att.drainage_attribute_id,
+		att.drainage_id,
+		att.attribute_name,
+		att.attribute_type,
+		att.normal,
+		att.measures,
+		dra.drainage_name as draname
+		from  pip_drainage_attribute att
+		left join pip_drainage dra on att.drainage_id =dra.drainage_id
+		<where>
+			att.del_flag = 0
+			<if test="id !=null">
+				and att.drainage_id = #{id}
+			</if>
+		</where>
+	</select>
+
+
+
+	<resultMap id="DrainageAttributeMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.piping.DrainageAttributeVo">
+		<id property="id" column="id"/>
+		<result property="drainageAttributeId" column="drainage_attribute_id"/>
+		<result property="drainageId" column="drainage_id"/>
+		<result property="attributeName" column="attribute_name"/>
+		<result property="attributeType" column="attribute_type"/>
+		<result property="normal" column="normal"/>
+		<result property="measures" column="measures"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+
+		<result property="drainageName" column="draname"/>
+	</resultMap>
+
+
+  <resultMap id="pipDrainageAttributeMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.DrainageAttribute">
+                  <id property="id" column="id"/>
+                        <result property="drainageAttributeId" column="drainage_attribute_id"/>
+                        <result property="drainageId" column="drainage_id"/>
+                        <result property="attributeName" column="attribute_name"/>
+                        <result property="attributeType" column="attribute_type"/>
+                        <result property="normal" column="normal"/>
+                        <result property="measures" column="measures"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

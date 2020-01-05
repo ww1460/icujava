@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.PatientMapper">
+
+	<sql id="patientList">
+		pat.id,
+		pat.patient_id,
+		pat.hisid,
+		pat.rfid_id,
+		pat.name,
+		pat.gender,
+		pat.birthday,
+		pat.blood,
+		pat.nationality,
+		pat.nation,
+		pat.id_type,
+		pat.id_number,
+		pat.phone,
+		pat.marriage,
+		pat.career,
+		pat.age,
+		pat.monthage,
+		pat.birthweight,
+		pat.hospitalweight,
+		pat.medical_records,
+		pat.outpatient,
+		pat.hospitalnumber,
+		pat.ohip,
+		pat.seedoctor,
+		pat.currentaddressprovince,
+		pat.currentaddresscity,
+		pat.currentaddresscounty,
+		pat.currentaddress,
+		pat.contactperson,
+		pat.relation,
+		pat.contactlocation,
+		pat.contactphone,
+		pat.admission_path,
+		pat.entrance_time,
+		pat.admission_department,
+		pat.time_of_admission,
+		pat.frequency,
+		pat.education_level,
+		pat.admission_ward,
+		pat.admission_beds,
+		pat.turndepartment,
+		pat.discharge_department,
+		pat.discharge_time,
+		pat.discharge_ward,
+		pat.discharge_type,
+		pat.discharge_where_about,
+		pat.allergichistory,
+		pat.fzyregisterid,
+		pat.diagnosis,
+		pat.section_time,
+		pat.fadviceusername,
+		pat.fadvicetime,
+		pat.entry_state,
+		pat.del_flag,
+		bed.bed_id as bed_id,
+		bed.bed_name as bed_name
+	</sql>
+
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.patient.PatientBo" resultMap="patPatientMapVo">
+		select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join nur_nurse_patient_correlation cor  on pat.patient_id = cor.patient_id
+		left join pat_patient_bed_correlation cbed on pat.patient_id =  cbed.patient_id
+		left join nur_hospital_bed bed on cbed.bed_id = bed.bed_id
+		<where>
+			pat.del_flag =0 and entry_state =2
+			<if test="patientBo.admissionDepartment != null" >
+				and pat.admission_department = #{patientBo.admissionDepartment}
+			</if>
+			<if test="patientBo.registerNurseId !=null" >
+				and cor.nurse_id = #{patientBo.registerNurseId}
+			</if>
+			<if test="patientBo.name !=null and patientBo.name !=''">
+				and pat.name like CONCAT('%',#{patientBo.name},'%')
+			</if>
+			<if test="patientBo.diagnosis !=null and patientBo.diagnosis !=''">
+				and pat.diagnosis like CONCAT('%',#{patientBo.diagnosis},'%')
+			</if>
+			<if test="patientBo.hospitalnumber !=null and patientBo.hospitalnumber !=''">
+				and pat.hospitalnumber like CONCAT('%',#{patientBo.hospitalnumber},'%')
+			</if>
+		</where>
+		union
+		(select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join pat_patient_bed_correlation cbed on pat.patient_id =  cbed.patient_id
+		left join nur_hospital_bed bed on cbed.bed_id = bed.bed_id
+		<where>
+			pat.del_flag =0 and entry_state =2
+			<if test="patientBo.admissionDepartment != null" >
+				and pat.admission_department = #{patientBo.admissionDepartment}
+			</if>
+			<if test="patientBo.name !=null and patientBo.name !=''">
+				and pat.name like CONCAT('%',#{patientBo.name},'%')
+			</if>
+			<if test="patientBo.diagnosis !=null and patientBo.diagnosis !=''">
+				and pat.diagnosis like CONCAT('%',#{patientBo.diagnosis},'%')
+			</if>
+			<if test="patientBo.hospitalnumber !=null and patientBo.hospitalnumber !=''">
+				and pat.hospitalnumber like CONCAT('%',#{patientBo.hospitalnumber},'%')
+			</if>
+		</where>
+		order by pat.id desc
+		)
+	</select>
+
+	<!-- 患者全查 ，  可通过在科状态分别查询  在科  、入科中    、出科的患者-->
+	<select id="inSciencePatientAll" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.patient.PatientBo" resultMap="patPatientMapVo">
+		select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join pat_patient_bed_correlation cor on pat.patient_id =  cor.patient_id
+		left join nur_hospital_bed bed on cor.bed_id = bed.bed_id
+		<where>
+			pat.del_flag =0
+			<if test="patientBo.admissionDepartment != null" >
+				and pat.admission_department = #{patientBo.admissionDepartment}
+			</if>
+			<if test="patientBo.entryState != null" >
+				and pat.entry_state = #{patientBo.entryState}
+			</if>
+			<if test="patientBo.name !=null and patientBo.name !=''">
+				and pat.name = #{patientBo.name}
+			</if>
+
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+
+	<!-- 患者全查 ，  可通过在科状态分别查询  在科  、入科中    、出科的患者-->
+	<select id="entryStateSelect" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.patient.PatientBo" resultMap="patPatientMapVo">
+		select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join pat_patient_bed_correlation cor on pat.patient_id =  cor.patient_id
+		left join nur_hospital_bed bed on cor.bed_id = bed.bed_id
+		<where>
+			pat.del_flag =0 and(pat.entry_state =2 or pat.entry_state =4)
+			<if test="patientBo.admissionDepartment != null" >
+				and pat.admission_department = #{patientBo.admissionDepartment}
+			</if>
+			<if test="patientBo.entryState != null" >
+				and entry_state = #{patientBo.entryState}
+			</if>
+
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+
+	<!-- 分页查询数据在科患者 用于流程 -->
+	<select id="inSciencePatient" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.patient.PatientBo" resultMap="patPatientMapVo">
+		select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join pat_patient_bed_correlation cor on pat.patient_id =  cor.patient_id
+		left join nur_hospital_bed bed on cor.bed_id = bed.bed_id
+		<where>
+			pat.del_flag =0 and entry_state =2
+			<if test="patientBo.admissionDepartment != null" >
+				and pat.admission_department = #{patientBo.admissionDepartment}
+			</if>
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+
+
+	<sql id="departurePatient">
+		pat.id,
+		pat.patient_id,
+		pat.hisid,
+		pat.rfid_id,
+		pat.name,
+		pat.gender,
+		pat.birthday,
+		pat.blood,
+		pat.nationality,
+		pat.nation,
+		pat.id_type,
+		pat.id_number,
+		pat.phone,
+		pat.marriage,
+		pat.career,
+		pat.age,
+		pat.monthage,
+		pat.birthweight,
+		pat.hospitalweight,
+		pat.medical_records,
+		pat.outpatient,
+		pat.hospitalnumber,
+		pat.ohip,
+		pat.seedoctor,
+		pat.currentaddressprovince,
+		pat.currentaddresscity,
+		pat.currentaddresscounty,
+		pat.currentaddress,
+		pat.contactperson,
+		pat.relation,
+		pat.contactlocation,
+		pat.contactphone,
+		pat.admission_path,
+		pat.entrance_time,
+		pat.admission_department,
+		pat.time_of_admission,
+		pat.frequency,
+		pat.education_level,
+		pat.admission_ward,
+		pat.admission_beds,
+		pat.turndepartment,
+		pat.discharge_department,
+		pat.discharge_time,
+		pat.discharge_ward,
+		pat.discharge_type,
+		pat.discharge_where_about,
+		pat.allergichistory,
+		pat.fzyregisterid,
+		pat.diagnosis,
+		pat.section_time,
+		pat.fadviceusername,
+		pat.fadvicetime,
+		pat.entry_state,
+		pat.del_flag,
+		bed.bed_id as bed_id,
+		bed.bed_name as bed_name,
+		beds.bed_name as adm_bed_name
+	</sql>
+	<!-- 分页查询数据出科患者 -->
+	<select id="departurePatient" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.patient.PatientBo" resultMap="patPatientMapVo">
+		select
+		<include refid="departurePatient"></include>
+		from pat_patient pat
+		left join nur_hospital_bed bed on pat.discharge_bed = bed.bed_id
+		left join nur_hospital_bed beds on pat.admission_beds = beds.bed_id
+		<where>
+			pat.del_flag =0 and entry_state =3
+			<if test="patientBo.dischargeDepartment !=null" >
+				and pat.dischargeDepartment like CONCAT('%',#{patientBo.dischargeDepartment},'%')
+			</if>
+			<if test="patientBo.dischargeStartTime !=null and patientBo.dischargeEndTime !=null">
+
+				and  date_format(pat.discharge_time,'%Y-%m-%d') >= date_format(#{patientBo.dischargeStartTime},'%Y-%m-%d')
+				and  date_format(#{patientBo.dischargeEndTime},'%Y-%m-%d') >= date_format(pat.discharge_time,'%Y-%m-%d')
+		     </if>
+		     <if test="patientBo.hospitalnumber !=null and patientBo.hospitalnumber !=''">
+				and pat.hospitalnumber like CONCAT('%',#{patientBo.hospitalnumber},'%')
+			 </if>
+			<if test="patientBo.name !=null and patientBo.name !=''">
+				and pat.name like CONCAT('%',#{patientBo.name},'%')
+			</if>
+			<if test="patientBo.dischargeType !=null and patientBo.dischargeType !=''">
+				and pat.discharge_type = #{patientBo.dischargeType}
+			</if>
+			<if test="patientBo.entryEndTime !=null and patientBo.entryStartTime !=null">
+				and  date_format(pat.entrance_time,'%Y-%m-%d') >= date_format(#{patientBo.entryStartTime},'%Y-%m-%d')
+				and  date_format(#{patientBo.entryEndTime},'%Y-%m-%d') >= date_format(pat.entrance_time,'%Y-%m-%d')
+			</if>
+			<if test="patientBo.diagnosis !=null and patientBo.diagnosis !=''">
+				and pat.diagnosis = #{patientBo.diagnosis}
+			</if>
+			<if test="patientBo.dischargeWhereAbout !=null and patientBo.dischargeWhereAbout !=''">
+				 and pat.discharge_where_about like CONCAT('%',#{patientBo.dischargeWhereAbout},'%')
+			</if>
+			<if test="patientBo.admissionDepartment != null" >
+				and pat.admission_department = #{patientBo.admissionDepartment}
+			</if>
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+
+	<!-- 通过his中的患者id查询数据源 -->
+	<select id="getHisId" parameterType="java.lang.String" resultMap="patPatientMapVo">
+		select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join pat_patient_bed_correlation cor on pat.patient_id =  cor.patient_id
+		left join nur_hospital_bed bed on cor.bed_id = bed.bed_id
+		<where>
+
+			<if test="hisId !=null and hisId !=''">
+				and pat.hisid = #{hisId}
+			</if>
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+	<!-- 通过雪花患者id查询数据源 -->
+	<select id="getByPatientId" parameterType="java.lang.String" resultMap="patPatientMap">
+		select
+		*
+		from pat_patient pat
+		<where>
+			pat.del_flag =0
+			<if test="patientId !=null and patientId  !=''">
+				and pat.patient_id = #{patientId}
+			</if>
+
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+	<!-- 在线患者数统计 -->
+	<select id="getOnlinePatient" resultMap="patPatientMapVo">
+		select *
+		from pat_patient where entry_state = 2
+	</select>
+
+	<!-- 今日出科数据 -->
+	<select id="getDischargeNumber" resultMap="patPatientMapVo">
+		select
+		*
+		from pat_patient patient
+		where patient.del_flag =0
+		and patient.discharge_time is not null
+		and patient.discharge_time <![CDATA[<= ]]> date_add(now(), interval 1 day)
+		and patient.discharge_time <![CDATA[>= ]]> date_sub(now(), interval 1 day)
+	</select>
+
+	<!-- 获取所有入科人数的总数 -->
+	<select id="getAllPatient" resultType="java.lang.Integer">
+		select count(*) from pat_patient
+	</select>
+
+	<!-- 获取今日入科人数的总数 -->
+	<select id="getTodayBuildPatientNumber" resultType="java.lang.Integer">
+		select count(*) from pat_patient where entrance_time between current_date() and date_format(current_date,'%Y-%m-%d 23:59:59')
+	</select>
+
+	<!-- 获取当日入科并出科的人数 -->
+	<select id="getTodayBuildPatientAndDischargeNumber" resultType="java.lang.Integer">
+		select count(*) from pat_patient where discharge_time between current_date() and date_format(current_date,'%Y-%m-%d 23:59:59')
+	</select>
+
+	<!-- 通过雪花患者id查询患者全部数据，包括床位 -->
+	<select id="patientIdSelect" parameterType="java.lang.String" resultMap="patPatientMapVo">
+		select
+		<include refid="patientList"></include>
+		from pat_patient pat
+		left join pat_patient_bed_correlation cor on pat.patient_id =  cor.patient_id
+		left join nur_hospital_bed bed on cor.bed_id = bed.bed_id
+		<where>
+			pat.del_flag =0
+			<if test="patientId !=null and patientId  !=''">
+				and pat.patient_id = #{patientId}
+			</if>
+
+		</where>
+		ORDER BY pat.id  desc
+	</select>
+
+	<resultMap id="patPatientMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.patient.PatientVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="hisid" column="hisid"/>
+		<result property="rfidId" column="rfid_id"/>
+		<result property="name" column="name"/>
+		<result property="gender" column="gender"/>
+		<result property="birthday" column="birthday"/>
+		<result property="blood" column="blood"/>
+		<result property="nationality" column="nationality"/>
+		<result property="nation" column="nation"/>
+		<result property="idType" column="id_type"/>
+		<result property="idNumber" column="id_number"/>
+		<result property="phone" column="phone"/>
+		<result property="marriage" column="marriage"/>
+		<result property="career" column="career"/>
+		<result property="age" column="age"/>
+		<result property="monthage" column="monthage"/>
+		<result property="birthweight" column="birthweight"/>
+		<result property="hospitalweight" column="hospitalweight"/>
+		<result property="medicalRecords" column="medical_records"/>
+		<result property="outpatient" column="outpatient"/>
+		<result property="hospitalnumber" column="hospitalnumber"/>
+		<result property="ohip" column="ohip"/>
+		<result property="seedoctor" column="seedoctor"/>
+		<result property="currentaddressprovince" column="currentaddressprovince"/>
+		<result property="currentaddresscity" column="currentaddresscity"/>
+		<result property="currentaddresscounty" column="currentaddresscounty"/>
+		<result property="currentaddress" column="currentaddress"/>
+		<result property="contactperson" column="contactperson"/>
+		<result property="relation" column="relation"/>
+		<result property="educationLevel" column="education_level"/>
+		<result property="contactlocation" column="contactlocation"/>
+		<result property="contactphone" column="contactphone"/>
+		<result property="admissionPath" column="admission_path"/>
+		<result property="admissionDepartment" column="admission_department"/>
+		<result property="admissionWard" column="admission_ward"/>
+		<result property="admissionBeds" column="admission_beds"/>
+		<result property="turndepartment" column="turndepartment"/>
+		<result property="dischargeDepartment" column="discharge_department"/>
+		<result property="dischargeTime" column="discharge_time"/>
+		<result property="dischargeWard" column="discharge_ward"/>
+		<result property="dischargeBed" column="discharge_bed"/>
+		<result property="dischargeType" column="discharge_type"/>
+		<result property="dischargeWhereAbout" column="discharge_where_about"/>
+		<result property="timeOfAdmission" column="time_of_admission"/>
+		<result property="entranceTime" column="entrance_time"/>
+		<result property="entranceTime" column="entrance_time"/>
+		<result property="allergichistory" column="allergichistory"/>
+		<result property="fzyregisterid" column="fzyregisterid"/>
+		<result property="diagnosis" column="diagnosis"/>
+		<result property="sectionTime" column="section_time"/>
+		<result property="fadviceusername" column="fadviceusername"/>
+		<result property="fadvicetime" column="fadvicetime"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="entryState" column="entry_state"/>
+
+		<result property="bedName" column="bed_name"/>
+		<result property="admDedName" column="adm_bed_name"/>
+
+	</resultMap>
+
+	<resultMap id="patPatientMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.Patient">
+                  <id property="id" column="id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="hisid" column="hisid"/>
+                        <result property="rfidId" column="rfid_id"/>
+                        <result property="name" column="name"/>
+                        <result property="gender" column="gender"/>
+                        <result property="birthday" column="birthday"/>
+                        <result property="blood" column="blood"/>
+                        <result property="nationality" column="nationality"/>
+                        <result property="nation" column="nation"/>
+                        <result property="idType" column="id_type"/>
+                        <result property="idNumber" column="id_number"/>
+                        <result property="phone" column="phone"/>
+                        <result property="marriage" column="marriage"/>
+                        <result property="career" column="career"/>
+                        <result property="age" column="age"/>
+                        <result property="monthage" column="monthage"/>
+                        <result property="birthweight" column="birthweight"/>
+                        <result property="hospitalweight" column="hospitalweight"/>
+                        <result property="medicalRecords" column="medical_records"/>
+                        <result property="outpatient" column="outpatient"/>
+                        <result property="hospitalnumber" column="hospitalnumber"/>
+                        <result property="ohip" column="ohip"/>
+                        <result property="seedoctor" column="seedoctor"/>
+                        <result property="currentaddressprovince" column="currentaddressprovince"/>
+                        <result property="currentaddresscity" column="currentaddresscity"/>
+                        <result property="currentaddresscounty" column="currentaddresscounty"/>
+                        <result property="currentaddress" column="currentaddress"/>
+                        <result property="contactperson" column="contactperson"/>
+                        <result property="relation" column="relation"/>
+						<result property="educationLevel" column="education_level"/>
+                        <result property="contactlocation" column="contactlocation"/>
+                        <result property="contactphone" column="contactphone"/>
+                        <result property="admissionPath" column="admission_path"/>
+                        <result property="admissionDepartment" column="admission_department"/>
+                        <result property="admissionWard" column="admission_ward"/>
+                        <result property="admissionBeds" column="admission_beds"/>
+                        <result property="turndepartment" column="turndepartment"/>
+                        <result property="dischargeDepartment" column="discharge_department"/>
+                        <result property="dischargeTime" column="discharge_time"/>
+                        <result property="dischargeWard" column="discharge_ward"/>
+						<result property="dischargeBed" column="discharge_bed"/>
+                        <result property="dischargeType" column="discharge_type"/>
+						<result property="dischargeWhereAbout" column="discharge_where_about"/>
+                        <result property="timeOfAdmission" column="time_of_admission"/>
+	 					 <result property="entranceTime" column="entrance_time"/>
+                        <result property="entranceTime" column="entrance_time"/>
+                        <result property="allergichistory" column="allergichistory"/>
+                        <result property="fzyregisterid" column="fzyregisterid"/>
+                        <result property="diagnosis" column="diagnosis"/>
+                        <result property="sectionTime" column="section_time"/>
+                        <result property="fadviceusername" column="fadviceusername"/>
+                        <result property="fadvicetime" column="fadvicetime"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateUserId" column="update_user_id"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+						<result property="entryState" column="entry_state"/>
+            </resultMap>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.TasksMapper">
+
+
+
+
+
+
+  <resultMap id="takTasksMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.Tasks">
+                  <id property="id" column="id"/>
+                        <result property="taskId" column="task_id"/>
+                        <result property="taskType" column="task_type"/>
+                        <result property="taskTypeId" column="task_type_id"/>
+                        <result property="taskName" column="task_name"/>
+                        <result property="taskDescribe" column="task_describe"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="dutyNurseId" column="duty_nurse_id"/>
+                        <result property="preStartTime" column="pre_start_time"/>
+                        <result property="preEndTime" column="pre_end_time"/>
+                        <result property="creatorId" column="creator_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="emergency" column="emergency"/>
+                        <result property="state" column="state"/>
+                        <result property="executionType" column="execution_type"/>
+                        <result property="subTaskNum" column="sub_task_num"/>
+                        <result property="executingNum" column="executing_num"/>
+                        <result property="taskRelation" column="task_relation"/>
+	  					<result property="progressBar" column="progress_bar"/>
+	  					<result property="completedNurseId" column="completed_nurse_id"/>
+                        <result property="receptionNurseId" column="reception_nurse_id"/>
+                        <result property="receiveTime" column="receive_time"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="endTime" column="end_time"/>
+                        <result property="result" column="result"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

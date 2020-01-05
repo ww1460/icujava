@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.drug.EasilyConfusedCatalogMapper">
+
+	<resultMap id="EasilyConfusedCatalogMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.drug.EasilyConfusedCatalog">
+		<id property="id" column="id"/>
+		<result property="easilyConfusedCatalogId" column="easily_confused_catalog_id"/>
+		<result property="drugConfusedType" column="drug_confused_type"/>
+		<result property="drugExplain" column="drug_explain"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+	<resultMap id="EasilyConfusedMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.drug.EasilyConfusedVo">
+		<id property="id" column="ids"/>
+		<result property="easilyConfusedCatalogId" column="easily_confused_catalog_ids"/>
+		<result property="drugConfusedType" column="drug_confused_types"/>
+		<result property="drugExplain" column="drug_explains"/>
+		<result property="createUserId" column="create_user_ids"/>
+		<result property="createTime" column="create_times"/>
+		<result property="delFlag" column="del_flags"/>
+		<result property="delTime" column="del_times"/>
+		<result property="delUserId" column="del_user_ids"/>
+		<result property="updateTime" column="update_times"/>
+		<result property="updateUserId" column="update_user_ids"/>
+		<collection property="easilyConfusedParticulars"
+			column="easily_confused_catalog_ids"
+			select="com.pig4cloud.pigx.ccxxicu.mapper.drug.EasilyConfusedParticularMapper.getList"
+					ofType="com.pig4cloud.pigx.ccxxicu.api.entity.drug.EasilyConfusedParticular"
+		/>
+	</resultMap>
+
+	<sql id="Map_List">
+		ecc.id as ids,
+		 ecc.easily_confused_catalog_id as easily_confused_catalog_ids,
+		 ecc.drug_confused_type as drug_confused_types,
+		 ecc.drug_explain as  drug_explains,
+		 ecc.create_user_id as create_user_ids,
+		 ecc.create_time as create_times,
+		 ecc.del_flag as del_flags,
+		 ecc.del_time as del_times,
+		 ecc.del_user_id as del_user_ids,
+		 ecc.update_time as update_times,
+		 ecc.update_user_id as update_user_ids
+	</sql>
+	<select id="getList" resultMap="EasilyConfusedMap" >
+
+		select
+		<include refid="Map_List"/>
+		FROM
+		drug_easily_confused_catalog ecc
+		WHERE
+		ecc.del_flag = 0
+		<if test=" query.drugConfusedType != null">
+			and ecc.drug_confused_type = #{query.drugConfusedType}
+		</if>
+
+	</select>
+
+	<sql id="result">
+		 ecc.id as ids,
+		 ecc.easily_confused_catalog_id as easily_confused_catalog_ids,
+		 ecc.drug_confused_type as drug_confused_types,
+		 ecc.drug_explain as  drug_explains,
+		 ecc.create_user_id as create_user_ids,
+		 ecc.create_time as create_times,
+		 ecc.del_flag as del_flags,
+		 ecc.del_time as del_times,
+		 ecc.del_user_id as del_user_ids,
+		 ecc.update_time as update_times,
+		 ecc.update_user_id as update_user_ids,
+	     ecp.id,
+		 ecp.easily_confused_particular_id,
+		 ecp.easily_confused_catalog_id,
+		 ecp.drug_name,
+		 ecp.drug_picture,
+		 ecp.drug_specification,
+		 ecp.drug_type,
+		 ecp.drug_indications,
+		 ecp.pharmacological_action,
+		 ecp.adverse_reaction,
+		 ecp.drug_taboo,
+		 ecp.remarks,
+		 ecp.create_user_id,
+		 ecp.create_time,
+		 ecp.del_flag,
+		 ecp.del_time,
+		 ecp.del_user_id,
+		 ecp.update_time,
+		 ecp.update_user_id
+	</sql>
+	<!--<select id="getList" resultMap="EasilyConfusedMap" >
+
+		select
+		<include refid="result"/>
+		FROM
+		drug_easily_confused_catalog ecc
+		LEFT JOIN drug_easily_confused_particular ecp ON ecp.easily_confused_catalog_id = ecc.easily_confused_catalog_id AND ecp.del_flag = 0
+		WHERE
+		ecc.del_flag = 0
+
+		<if test=" query.drugConfusedType != null">
+			and ecc.drug_confused_type = #{query.drugConfusedType}
+		</if>
+
+	</select>-->
+
+</mapper>

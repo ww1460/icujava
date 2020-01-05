@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.hisdata.DoctorsAdviceDictionariesMapper">
+
+
+
+
+	<!-- 通过标签名称、和雪花id查询数据  -->
+	<select id="getLabelName" resultMap="hisDoctorsAdviceDictionariesMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.DoctorsAdviceDictionaries">
+		select
+			id,
+			doctors_advice_dictionaries_id,
+			doctors_advice_type,
+			doctors_advice_type_id,
+			data_value,
+			label_name,
+			label_describe,
+			remarks_information,
+			del_flag
+			 from his_doctors_advice_dictionaries
+			 <where>
+				 del_flag =0
+				 <if test="test.labelName !=null">
+					and  label_name = #{test.labelName}
+				 </if>
+				 <if test="test.doctorsAdviceDictionariesId !=null">
+					 and  doctors_advice_dictionaries_id = #{test.doctorsAdviceDictionariesId}
+				 </if>
+				 <if test="test.doctorsAdviceTypeId !=null">
+					 and  doctors_advice_type_id = #{test.doctorsAdviceTypeId}
+				 </if>
+			 </where>
+	</select>
+
+	<!-- 条件数据查询  -->
+	<select id="selectAll" resultMap="hisDoctorsAdviceDictionariesMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.DoctorsAdviceDictionaries">
+		select
+		id,
+		doctors_advice_dictionaries_id,
+		doctors_advice_type,
+		doctors_advice_type_id,
+		data_value,
+		label_name,
+		label_describe,
+		remarks_information,
+		del_flag
+		from his_doctors_advice_dictionaries
+		<where>
+			del_flag =0
+			<if test="test.doctorsAdviceTypeId !=null">
+				and  doctors_advice_type_id = #{test.doctorsAdviceTypeId}
+			</if>
+		</where>
+	</select>
+
+	<select id="getLabelNameValueEnumByTypeValue" parameterType="java.lang.String"  resultType="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.DoctorsAdviceDictionaries">
+		select
+		*
+		from his_doctors_advice_dictionaries
+		where doctors_advice_type_id = #{type}
+	</select>
+
+  <resultMap id="hisDoctorsAdviceDictionariesMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.DoctorsAdviceDictionaries">
+                  <id property="id" column="id"/>
+                        <result property="doctorsAdviceDictionariesId" column="doctors_advice_dictionaries_id"/>
+                        <result property="doctorsAdviceType" column="doctors_advice_type"/>
+                        <result property="doctorsAdviceTypeId" column="doctors_advice_type_id"/>
+                        <result property="dataValue" column="data_value"/>
+                        <result property="labelName" column="label_name"/>
+                        <result property="labelDescribe" column="label_describe"/>
+                        <result property="remarksInformation" column="remarks_information"/>
+						  <result property="delFlag" column="del_flag"/>
+						  <result property="delTime" column="del_time"/>
+						  <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.hisdata.HisDoctorsAdviceMapper">
+
+
+	<sql id="doctorsAdviceList">
+			adv.id,
+			adv.his_doctors_advice_id,
+			adv.batch_number,
+			adv.frequency_count,
+			adv.doctors_advice_time,
+			adv.first_execution_time,
+			adv.automatic_stop_time,
+			adv.his_patient_id,
+			adv.type,
+			adv.update_time,
+			adv.emergency,
+		    adv.frequency,
+			adv.patient_id,
+			adv.state,
+			adv.del_flag,
+			adv.his_notice_flag,
+			pat.`name` as pat_name,
+	     	dic.data_value as data_value
+	</sql>
+
+
+	<!-- 医嘱数据全查 -->
+	<select id="selectAll" resultMap="hisDoctorsAdviceMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisDoctorsAdvice">
+
+		select
+			<include refid="doctorsAdviceList"></include>
+			 from his_doctors_advice adv
+			left join pat_patient pat on adv.patient_id = pat.patient_id
+		    left join his_doctors_advice_dictionaries dic on adv.frequency = dic.label_name
+		<where>
+			adv.del_flag = 0
+			<if test="hisDoctorsAdvice.patientId != null">
+				and adv.patient_id = #{hisDoctorsAdvice.patientId}
+			</if>
+
+		</where>
+	</select>
+
+
+	<!-- 查询当前登录护士相关的医嘱内容-->
+	<select id="LoginNurseDoctorsAdvice" resultMap="hisDoctorsAdviceMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.hisdata.HisDoctorsAdviceVo">
+
+		select
+		<include refid="doctorsAdviceList"></include>
+		from his_doctors_advice adv
+		left join pat_patient pat on adv.patient_id = pat.patient_id
+		left join his_doctors_advice_dictionaries dic on adv.frequency = dic.label_name
+		<where>
+			adv.del_flag = 0
+			<if test="hisDoctorsAdvice.deptId !=null">
+			and pat.admission_department = #{hisDoctorsAdvice.deptId}
+		</if>
+			<if test="hisDoctorsAdvice.patientId !=null">
+				and adv.patient_id = #{hisDoctorsAdvice.patientId}
+			</if>
+		</where>
+		and adv.patient_id in (
+		SELECT cor.patient_id FROM nur_nurse_patient_correlation cor
+		<where>
+			<if test="hisDoctorsAdvice.loginNurse != null">
+				and cor.nurse_id = #{hisDoctorsAdvice.loginNurse}
+			</if>
+		</where>)
+		order by adv.doctors_advice_time desc
+	</select>
+	
+	
+	
+
+	<!--通过id 查询医嘱的数据  -->
+	<select id="getById" resultMap="hisDoctorsAdviceMapVo" parameterType="java.lang.Integer">
+
+		select
+		<include refid="doctorsAdviceList"></include>
+		from his_doctors_advice adv
+		left join pat_patient pat on adv.patient_id = pat.patient_id
+		left join his_doctors_advice_dictionaries dic on adv.frequency = dic.label_name
+		<where>
+			adv.del_flag = 0
+			<if test="id!= null">
+				and adv.id = #{id}
+			</if>
+
+		</where>
+	</select>
+
+
+	<!--通过医嘱的雪花 id查询数据  -->
+	<select id="getDoctorsAdviceId" resultMap="hisDoctorsAdviceMapVo" parameterType="java.lang.String">
+
+		select
+		<include refid="doctorsAdviceList"></include>
+		from his_doctors_advice adv
+		left join pat_patient pat on adv.patient_id = pat.patient_id
+		left join his_doctors_advice_dictionaries dic on adv.frequency = dic.label_name
+		<where>
+			adv.del_flag = 0
+			<if test="doctorsAdviceId!= null">
+				and adv.doctors_advice_id = #{doctorsAdviceId}
+			</if>
+
+		</where>
+	</select>
+
+	<!-- 通过医嘱批次查询对象 -->
+	<select id="getBatchNumber" resultMap="hisDoctorsAdviceMap" parameterType="java.lang.String">
+
+		select
+		adv.id,
+		adv.doctors_advice_id,
+		adv.his_doctors_advice_id,
+		adv.batch_number,
+		adv.frequency_count,
+		adv.doctors_advice_time,
+		adv.first_execution_time,
+		adv.automatic_stop_time,
+		adv.update_time,
+		adv.type,
+		adv.emergency,
+		adv.frequency,
+		adv.patient_id,
+		adv.state,
+		adv.del_flag,
+		adv.his_notice_flag
+		from his_doctors_advice adv
+		<where>
+			adv.del_flag = 0
+			<if test="batchNumber != null">
+				and adv.batch_number = #{batchNumber}
+			</if>
+
+		</where>
+	</select>
+
+	<!-- 查询长期任务，用于定时任务  -->
+	<select id="longTermTask"  resultMap="hisDoctorsAdviceMapVo">
+		select
+		<include refid="doctorsAdviceList"></include>
+			from his_doctors_advice adv
+			left join pat_patient pat on adv.patient_id = pat.patient_id
+		    left join his_doctors_advice_dictionaries dic on adv.frequency = dic.label_name
+			<where>
+			adv.type = 1 and adv.state =1
+			</where>
+			order by adv.batch_number desc
+	</select>
+
+
+	<!-- 通过患者id 查询当前患者没有生成任务的医嘱 -->
+	<select id="notGenerate" resultMap="Ungenerated" parameterType="java.lang.String">
+		select
+			a.id,
+			a.batch_number,
+			a.his_doctors_advice_id,
+            a.his_patient_id,
+            a.his_notice_flag
+			 from his_doctors_advice a
+			where a.his_patient_id = #{hisPatientId} and
+            not exists(
+			select
+			t.source_items,
+			t.source_items_id
+			from  tak_task t
+			WHERE a.batch_number = t.source_items_id and
+			t.source_items = 1
+			and t.source_items_id is not NULL
+			)
+	</select>
+
+	<!-- 通过患者id 查询相关没有完成的医嘱 -->
+	<select id="stopDoctorsAdvice" resultMap="stopDoctorsAdviceMap" parameterType="java.lang.String">
+		select
+			id,
+			doctors_advice_id,
+			his_doctors_advice_id,
+			patient_id,
+			state,
+			del_flag,
+			his_notice_flag
+			from his_doctors_advice
+		<where>
+			state = 0 and del_flag = 0
+			<if test="patientId !=null">
+		 	and patient_id = #{patientId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 医嘱记录数 -->
+	<select id="getDoctorsAdviceForToday" resultMap="stopDoctorsAdviceMap">
+		select * from his_doctors_advice where doctors_advice_time between current_date() and date_format(current_date,'%Y-%m-%d 23:59:59');
+	</select>
+
+
+
+
+	<!-- 通过HIs患者id 查询相关没有完成的医嘱【校对已发送】的长期医嘱 ，和停止的短期医嘱 -->
+	<select id="stopDoctorsAdviceHisPatientId" parameterType="java.lang.String" resultMap="stopDoctorsAdviceHisPatientIdMap">
+		SELECT DISTINCT(id),state,del_flag,his_patient_id,his_doctors_advice_id,his_notice_flag,type from his_doctors_advice
+			WHERE  ((type = 1 and state = 24)or(type = 2 and state = 27))
+			and del_flag = 0 and his_patient_id =#{hisPaientId}
+	</select>
+
+
+	<resultMap id="stopDoctorsAdviceHisPatientIdMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisDoctorsAdvice">
+		<id property="id" column="id"/>
+		<result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="state" column="state"/>
+		<result property="hisPatientId" column="his_patient_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="hisNoticeFlag" column="his_notice_flag"/>
+		<result property="type" column="type"/>
+	</resultMap>
+
+
+
+
+
+
+
+
+
+	<resultMap id="stopDoctorsAdviceMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.hisdata.HisDoctorsAdviceVo">
+		<id property="id" column="id"/>
+		<result property="doctorsAdviceId" column="doctors_advice_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="state" column="state"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="hisNoticeFlag" column="his_notice_flag"/>
+	</resultMap>
+
+
+	<resultMap id="Ungenerated" type="com.pig4cloud.pigx.ccxxicu.api.vo.hisdata.HisDoctorsAdviceVo">
+		<id property="id" column="id"/>
+		<result property="doctorsAdviceId" column="doctors_advice_id"/>
+		<result property="batchNumber" column="batch_number"/>
+	</resultMap>
+
+
+	<resultMap id="hisDoctorsAdviceMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.hisdata.HisDoctorsAdviceVo">
+		<id property="id" column="id"/>
+		<result property="doctorsAdviceId" column="doctors_advice_id"/>
+		<result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+		<result property="batchNumber" column="batch_number"/>
+		<result property="frequencyCount" column="frequency_count"/>
+		<result property="doctorsAdviceTime" column="doctors_advice_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="type" column="type"/>
+		<result property="emergency" column="emergency"/>
+		<result property="firstExecutionTime" column="first_execution_time"/>
+		<result property="automaticStopTime" column="automatic_stop_time"/>
+		<result property="hisPatientId" column="his_patient_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="frequency" column="frequency"/>
+		<result property="state" column="state"/>
+		<result property="createTime" column="create_time"/>
+		<result property="hisNoticeFlag" column="his_notice_flag"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="dataValue" column="data_value"/>
+		<result property="patientName" column="pat_name"/>
+	</resultMap>
+
+  <resultMap id="hisDoctorsAdviceMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisDoctorsAdvice">
+                  <id property="id" column="id"/>
+                        <result property="doctorsAdviceId" column="doctors_advice_id"/>
+	  					<result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+                        <result property="batchNumber" column="batch_number"/>
+                        <result property="frequencyCount" column="frequency_count"/>
+                        <result property="doctorsAdviceTime" column="doctors_advice_time"/>
+                        <result property="type" column="type"/>
+                        <result property="emergency" column="emergency"/>
+	  					<result property="hisPatientId" column="his_patient_id"/>
+					    <result property="firstExecutionTime" column="first_execution_time"/>
+					    <result property="automaticStopTime" column="automatic_stop_time"/>
+                        <result property="patientId" column="patient_id"/>
+	  				    <result property="updateTime" column="update_time"/>
+	  					<result property="frequency" column="frequency"/>
+                        <result property="state" column="state"/>
+                        <result property="createTime" column="create_time"/>
+	  					 <result property="hisNoticeFlag" column="his_notice_flag"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+
+
+	<!-- 根据患者ID获取医嘱列表 -->
+	<select id="getHisDoctorAdviceListByPatientId" resultMap="hisDoctorsAdviceMapVo" parameterType="java.lang.String">
+		select * from his_doctors_advice
+		<where>
+			del_flag = 0
+			<if test="patientId != null">
+			and patient_id  = #{patientId}
+			</if>
+		</where>
+	</select>
+</mapper>

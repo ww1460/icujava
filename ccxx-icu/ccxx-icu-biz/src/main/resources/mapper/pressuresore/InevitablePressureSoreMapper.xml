@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.pressuresore.InevitablePressureSoreMapper">
+
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.pressuresore.InevitablePressureSore" resultMap="preUnavoidablePressureUlcerDeclarationFormMapVo">
+		select
+			orm.id,
+			orm.patient_id,
+			orm.patient_name,
+			orm.gender,
+			orm.age,
+			orm.hospitalnumber,
+			orm.bed_id,
+			orm.dept_id,
+			orm.time_of_admission,
+			orm.declare_time,
+			orm.declarer,
+			orm.diagnosis,
+			orm.nursing_level,
+			orm.declare_reason,
+			orm.preventive_nursing_measures,
+			orm.occurrence_time,
+			orm.pre_position,
+			orm.sore_range,
+			orm.by_stages,
+			orm.responsible_nurse,
+			orm.responsible_nurse_time,
+			orm.head_nurse,
+			orm.dept_head_nurse,
+			orm.dept_head_nurse_declare,
+			orm.dept_head_nurse_time,
+			orm.wound_management_group,
+			orm.wound_management_group_declare,
+			orm.wound_management_group_time,
+			orm.pressure_sore_outcome,
+			orm.nursing_department,
+			orm.nursing_department_time,
+			bed.bed_name as bed_name
+			 from pre_inevitable_pressure_sore orm
+			left join pat_patient_bed_correlation cor on orm.patient_id = cor.patient_id
+			left join nur_hospital_bed bed on cor.bed_id = bed.bed_id
+			<where>
+				orm.del_flag=0
+				<if test="form.patientId !=null">
+					and orm.patient_id = #{form.patientId}
+				</if>
+			</where>
+			order by orm.id desc
+	</select>
+
+
+	<resultMap id="preUnavoidablePressureUlcerDeclarationFormMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.pressuresore.InevitablePressureSoreVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="gender" column="gender"/>
+		<result property="age" column="age"/>
+		<result property="hospitalnumber" column="hospitalnumber"/>
+		<result property="bedId" column="bed_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="timeOfAdmission" column="time_of_admission"/>
+		<result property="declareTime" column="declare_time"/>
+		<result property="declarer" column="declarer"/>
+		<result property="diagnosis" column="diagnosis"/>
+		<result property="nursingLevel" column="nursing_level"/>
+		<result property="declareReason" column="declare_reason"/>
+		<result property="preventiveNursingMeasures" column="preventive_nursing_measures"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="prePosition" column="pre_position"/>
+		<result property="soreRange" column="sore_range"/>
+		<result property="byStages" column="by_stages"/>
+		<result property="responsibleNurse" column="responsible_nurse"/>
+		<result property="responsibleNurseTime" column="responsible_nurse_time"/>
+		<result property="headNurse" column="head_nurse"/>
+		<result property="deptHeadNurse" column="dept_head_nurse"/>
+		<result property="deptHeadNurseDeclare" column="dept_head_nurse_declare"/>
+		<result property="deptHeadNurseTime" column="dept_head_nurse_time"/>
+		<result property="woundManagementGroup" column="wound_management_group"/>
+		<result property="woundManagementGroupDeclare" column="wound_management_group_declare"/>
+		<result property="woundManagementGroupTime" column="wound_management_group_time"/>
+		<result property="pressureSoreOutcome" column="pressure_sore_outcome"/>
+		<result property="nursingDepartment" column="nursing_department"/>
+		<result property="nursingDepartmentTime" column="nursing_department_time"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="bedName" column="bed_name"/>
+	</resultMap>
+
+
+
+  <resultMap id="preUnavoidablePressureUlcerDeclarationFormMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.pressuresore.InevitablePressureSore">
+                  <id property="id" column="id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="patientName" column="patient_name"/>
+                        <result property="gender" column="gender"/>
+                        <result property="age" column="age"/>
+                        <result property="hospitalnumber" column="hospitalnumber"/>
+                        <result property="bedId" column="bed_id"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="timeOfAdmission" column="time_of_admission"/>
+                        <result property="declareTime" column="declare_time"/>
+                        <result property="declarer" column="declarer"/>
+                        <result property="diagnosis" column="diagnosis"/>
+                        <result property="nursingLevel" column="nursing_level"/>
+                        <result property="declareReason" column="declare_reason"/>
+                        <result property="preventiveNursingMeasures" column="preventive_nursing_measures"/>
+                        <result property="occurrenceTime" column="occurrence_time"/>
+                        <result property="prePosition" column="pre_position"/>
+                        <result property="soreRange" column="sore_range"/>
+                        <result property="byStages" column="by_stages"/>
+                        <result property="responsibleNurse" column="responsible_nurse"/>
+                        <result property="responsibleNurseTime" column="responsible_nurse_time"/>
+                        <result property="headNurse" column="head_nurse"/>
+                        <result property="deptHeadNurse" column="dept_head_nurse"/>
+                        <result property="deptHeadNurseDeclare" column="dept_head_nurse_declare"/>
+                        <result property="deptHeadNurseTime" column="dept_head_nurse_time"/>
+                        <result property="woundManagementGroup" column="wound_management_group"/>
+                        <result property="woundManagementGroupDeclare" column="wound_management_group_declare"/>
+                        <result property="woundManagementGroupTime" column="wound_management_group_time"/>
+                        <result property="pressureSoreOutcome" column="pressure_sore_outcome"/>
+                        <result property="nursingDepartment" column="nursing_department"/>
+                        <result property="nursingDepartmentTime" column="nursing_department_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+            </resultMap>
+</mapper>

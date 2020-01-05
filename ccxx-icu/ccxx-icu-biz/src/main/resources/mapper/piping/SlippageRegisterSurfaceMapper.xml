@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.piping.SlippageRegisterSurfaceMapper">
+
+
+	<!-- 分页数据全查 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.SlippageRegisterSurface" resultMap="pipSlippageRegisterSurfaceMapVo">
+		select
+		sur.id,
+		sur.patient_id,
+		sur.patient_name,
+		sur.hospitalnumber,
+		sur.gender,
+		sur.diagnosis,
+		sur.age,
+		sur.diagnosis,
+		sur.education_level,
+		sur.piping_id,
+		sur.piping_describe,
+		sur.piping_slippage_time,
+		sur.piping_start_time,
+		sur.operation_time,
+		sur.nursing_level,
+		sur.consciousness,
+		sur.consciousness_time,
+		sur.mentality,
+		sur.mentality_time,
+		sur.activity_ability,
+		sur.activity_ability_time,
+		sur.piping_causes_of_slippage,
+		sur.piping_treatment_measures,
+		sur.piping_fixed_method,
+		sur.health_education,
+		sur.health_education_time,
+		sur.restraint_zone,
+		sur.restraint_zone_time,
+		sur.if_someone,
+		sur.pipeline_slip_complication,
+		sur.complication_describe,
+		sur.medicine,
+		sur.medicine_name,
+		sur.filler,
+		sur.filler_date,
+		sur.dept_id,
+		sur.del_flag,
+		nur.real_name as nur_name,
+		pip.piping_name as pip_name
+		from pip_slippage_register_surface sur
+		left join nur_nurse nur on sur.filler = nur.nurse_id
+		left join pip_piping pip on sur.piping_id = pip.piping_name
+			<where>
+			sur.del_flag = 0
+			<if test="slippageRegisterSurface.patientId !=null">
+			  and sur.patient_id = #{slippageRegisterSurface.patientId}
+			</if>
+			<if test="slippageRegisterSurface.gender !=null">
+				and  sur.gender = #{slippageRegisterSurface.gender}
+			</if>
+				<if test="slippageRegisterSurface.filler !=null">
+				and sur.filler = #{slippageRegisterSurface.filler}
+				</if>
+				<if test="slippageRegisterSurface.deptId !=null">
+					and sur.dept_id = #{slippageRegisterSurface.deptId}
+				</if>
+				<if test="slippageRegisterSurface.pipingId !=null">
+					and sur.piping_id = #{slippageRegisterSurface.pipingId}
+				</if>
+			</where>
+			order by sur.id desc
+	</select>
+
+	<!-- 全查 -->
+	<select id="all" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.SlippageRegisterSurface" resultMap="pipSlippageRegisterSurfaceMapVo">
+		select
+		sur.id,
+		sur.patient_id,
+		sur.patient_name,
+		sur.hospitalnumber,
+		sur.gender,
+		sur.diagnosis,
+		sur.age,
+		sur.diagnosis,
+		sur.education_level,
+		sur.piping_id,
+		sur.piping_describe,
+		sur.piping_slippage_time,
+		sur.piping_start_time,
+		sur.operation_time,
+		sur.nursing_level,
+		sur.consciousness,
+		sur.consciousness_time,
+		sur.mentality,
+		sur.mentality_time,
+		sur.activity_ability,
+		sur.activity_ability_time,
+		sur.piping_causes_of_slippage,
+		sur.piping_treatment_measures,
+		sur.piping_fixed_method,
+		sur.health_education,
+		sur.health_education_time,
+		sur.restraint_zone,
+		sur.restraint_zone_time,
+		sur.if_someone,
+		sur.pipeline_slip_complication,
+		sur.complication_describe,
+		sur.medicine,
+		sur.medicine_name,
+		sur.filler,
+		sur.filler_date,
+		sur.dept_id,
+		sur.del_flag,
+		nur.real_name as nur_name,
+		pip.piping_name as pip_name
+		from pip_slippage_register_surface sur
+		left join nur_nurse nur on sur.filler = nur.nurse_id
+		left join pip_piping pip on sur.piping_id = pip.piping_name
+		<where>
+			sur.del_flag = 0
+			<if test="slippageRegisterSurface.patientId !=null">
+				and sur.patient_id = #{slippageRegisterSurface.patientId}
+			</if>
+			<if test="slippageRegisterSurface.gender !=null">
+				and  sur.gender = #{slippageRegisterSurface.gender}
+			</if>
+			<if test="slippageRegisterSurface.filler !=null">
+				and sur.filler = #{slippageRegisterSurface.filler}
+			</if>
+			<if test="slippageRegisterSurface.deptId !=null">
+				and sur.dept_id = #{slippageRegisterSurface.deptId}
+			</if>
+			<if test="slippageRegisterSurface.pipingId !=null">
+				and sur.piping_id = #{slippageRegisterSurface.pipingId}
+			</if>
+		</where>
+		order by sur.id desc
+	</select>
+
+
+	<resultMap id="pipSlippageRegisterSurfaceMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.piping.SlippageRegisterSurfaceVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="hospitalnumber" column="hospitalnumber"/>
+		<result property="gender" column="gender"/>
+		<result property="age" column="age"/>
+		<result property="diagnosis" column="diagnosis"/>
+		<result property="educationLevel" column="education_level"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="pipingDescribe" column="piping_describe"/>
+		<result property="pipingSlippageTime" column="piping_slippage_time"/>
+		<result property="pipingStartTime" column="piping_start_time"/>
+		<result property="operationTime" column="operation_time"/>
+		<result property="nursingLevel" column="nursing_level"/>
+		<result property="consciousness" column="consciousness"/>
+		<result property="consciousnessTime" column="consciousness_time"/>
+		<result property="mentality" column="mentality"/>
+		<result property="mentalityTime" column="mentality_time"/>
+		<result property="activityAbility" column="activity_ability"/>
+		<result property="activityAbilityTime" column="activity_ability_time"/>
+		<result property="pipingCausesOfSlippage" column="piping_causes_of_slippage"/>
+		<result property="pipingTreatmentMeasures" column="piping_treatment_measures"/>
+		<result property="pipingFixedMethod" column="piping_fixed_method"/>
+		<result property="healthEducation" column="health_education"/>
+		<result property="healthEducationTime" column="health_education_time"/>
+		<result property="restraintZone" column="restraint_zone"/>
+		<result property="restraintZoneTime" column="restraint_zone_time"/>
+		<result property="ifSomeone" column="if_someone"/>
+		<result property="pipelineSlipComplication" column="pipeline_slip_complication"/>
+		<result property="complicationDescribe" column="complication_describe"/>
+		<result property="medicine" column="medicine"/>
+		<result property="medicineName" column="medicine_name"/>
+		<result property="filler" column="filler"/>
+		<result property="fillerDate" column="filler_date"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="nurseName" column="nur_name"/>
+		<result property="pipingName" column="pip_name"/>
+
+	</resultMap>
+
+
+
+
+
+
+
+
+
+  <resultMap id="pipSlippageRegisterSurfaceMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.SlippageRegisterSurface">
+                  <id property="id" column="id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="patientName" column="patient_name"/>
+                        <result property="hospitalnumber" column="hospitalnumber"/>
+                        <result property="gender" column="gender"/>
+                        <result property="age" column="age"/>
+                        <result property="diagnosis" column="diagnosis"/>
+                        <result property="educationLevel" column="education_level"/>
+                        <result property="pipingId" column="piping_id"/>
+                        <result property="pipingDescribe" column="piping_describe"/>
+                        <result property="pipingSlippageTime" column="piping_slippage_time"/>
+                        <result property="pipingStartTime" column="piping_start_time"/>
+                        <result property="operationTime" column="operation_time"/>
+                        <result property="nursingLevel" column="nursing_level"/>
+                        <result property="consciousness" column="consciousness"/>
+                        <result property="consciousnessTime" column="consciousness_time"/>
+                        <result property="mentality" column="mentality"/>
+                        <result property="mentalityTime" column="mentality_time"/>
+                        <result property="activityAbility" column="activity_ability"/>
+                        <result property="activityAbilityTime" column="activity_ability_time"/>
+                        <result property="pipingCausesOfSlippage" column="piping_causes_of_slippage"/>
+                        <result property="pipingTreatmentMeasures" column="piping_treatment_measures"/>
+                        <result property="pipingFixedMethod" column="piping_fixed_method"/>
+                        <result property="healthEducation" column="health_education"/>
+                        <result property="healthEducationTime" column="health_education_time"/>
+                        <result property="restraintZone" column="restraint_zone"/>
+                        <result property="restraintZoneTime" column="restraint_zone_time"/>
+                        <result property="ifSomeone" column="if_someone"/>
+                        <result property="pipelineSlipComplication" column="pipeline_slip_complication"/>
+                        <result property="complicationDescribe" column="complication_describe"/>
+                        <result property="medicine" column="medicine"/>
+                        <result property="medicineName" column="medicine_name"/>
+                        <result property="filler" column="filler"/>
+                        <result property="fillerDate" column="filler_date"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

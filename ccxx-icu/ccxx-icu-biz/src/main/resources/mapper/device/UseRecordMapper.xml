@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.device.UseRecordMapper">
+
+
+
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.device.UseRecord" resultMap="devUseRecordMapVo">
+		SELECT
+		u.id,
+		u.device_id,
+		u.patient_id,
+		u.nurse_id,
+		u.item_number,
+		u.device_id,
+		u.start_time,
+		u.end_time,
+		u.del_flag,
+		u.total_length_of_time,
+		p.`name` as pname,
+		n.real_name as nrealname,
+		d.`name` as dname
+		from dev_use_record u
+		left join pat_patient p on u.patient_id = p.patient_id
+		left join nur_nurse n on u.nurse_id = n.nurse_id
+		left join dev_device d on u.device_id = d.device_id
+		<where>
+			u.del_flag =0
+			<if test="useRecord.patientId !=  null">
+				and u.patient_id =#{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId !=  null">
+				and u.dept_id =#{useRecord.deptId}
+			</if>
+			<if test="useRecord.deviceId !=  null">
+				and u.device_id =#{useRecord.deviceId}
+			</if>
+		</where>
+		order by u.id DESC
+	</select>
+
+
+
+
+	<!-- 条件数据查询 -->
+	<select id="selectAll" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.device.UseRecord" resultMap="devUseRecordMapVo">
+		SELECT
+		u.id,
+		u.device_id,
+		u.patient_id,
+		u.nurse_id,
+		u.item_number,
+		u.start_time,
+		u.device_id,
+		u.end_time,
+		u.del_flag,
+		u.total_length_of_time,
+		p.`name` as pname,
+		n.real_name as nrealname,
+		d.`name` as dname
+		from dev_use_record u
+		left join pat_patient p on u.patient_id = p.patient_id
+		left join nur_nurse n on u.nurse_id = n.nurse_id
+		left join dev_device d on u.device_id = d.device_id
+		<where>
+			u.del_flag =0
+			<if test="useRecord.patientId !=  null">
+				and u.patient_id =#{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId !=  null">
+				and u.dept_id =#{useRecord.deptId}
+			</if>
+			<if test="useRecord.deviceId !=  null">
+				and u.device_id =#{useRecord.deviceId}
+			</if>
+		</where>
+		order by u.id DESC
+	</select>
+
+
+
+
+	<!-- 数据查询连接中得设备 -->
+	<select id="selectInConnected" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.device.UseRecord" resultMap="devUseRecordMapVo">
+		SELECT
+		u.id,
+		u.device_id,
+		u.patient_id,
+		u.nurse_id,
+		u.item_number,
+		u.start_time,
+		u.end_time,
+		u.device_id,
+		u.del_flag,
+		u.total_length_of_time,
+		p.`name` as pname,
+		n.real_name as nrealname,
+		d.`name` as dname
+		from dev_use_record u
+		left join pat_patient p on u.patient_id = p.patient_id
+		left join nur_nurse n on u.nurse_id = n.nurse_id
+		left join dev_device d on u.device_id = d.device_id
+		<where>
+			u.del_flag =0	and u.end_time is null and u.start_time is not null
+			<if test="useRecord.patientId !=  null">
+				and u.patient_id =#{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId !=  null">
+				and u.dept_id =#{useRecord.deptId}
+			</if>
+			<if test="useRecord.deviceId !=  null">
+				and u.device_id =#{useRecord.deviceId}
+			</if>
+		</where>
+		order by u.id DESC
+	</select>
+
+	<resultMap id="devUseRecordMapVo" type= "com.pig4cloud.pigx.ccxxicu.api.vo.device.UseRecordVo">
+		<id property="id" column="id"/>
+		<result property="useRecordId" column="use_record_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="deviceId" column="device_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="itemNumber" column="item_number"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="totalLengthOfTime" column="total_length_of_time"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="patientName" column="pname"/>
+		<result property="nurseName" column="nrealname"/>
+		<result property="deviceName" column="dname"/>
+	</resultMap>
+
+
+
+	<!-- 通过患者id查询连接中管道数据  用于患者出科 -->
+	<select id="stopDevice" resultMap="stopDeviceMap" parameterType="java.lang.String">
+		select
+			 id,
+			use_record_id,
+			device_id,
+			patient_id,
+			start_time,
+			del_flag
+			from dev_use_record
+			WHERE end_time is null and del_flag = 0
+			<if test="patientId !=null">
+				and  patient_id = #{patientId}
+			</if>
+	</select>
+
+	<resultMap id="stopDeviceMap" type= "com.pig4cloud.pigx.ccxxicu.api.entity.device.UseRecord">
+		<id property="id" column="id"/>
+		<result property="useRecordId" column="use_record_id"/>
+		<result property="deviceId" column="device_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="startTime" column="start_time"/>
+	</resultMap>
+
+
+
+
+	<!--
+
+
+    <where>
+                    u.del_flag =0
+                    <if test="patientId !=  null">
+                        and  u.patient_id =#{patientId}
+                    </if>
+                    <if test="u.nurseId !=  null">
+                        and u.nurse_id =#{nurseId}
+                    </if>
+                    <if test="u.deviceId  != null">
+                        and  u.device_id =#{deviceId}
+                    </if>
+                </where>
+
+    -->
+
+
+
+
+
+
+
+
+  <resultMap id="devUseRecordMap" type= "com.pig4cloud.pigx.ccxxicu.api.entity.device.UseRecord">
+                  <id property="id" column="id"/>
+                        <result property="useRecordId" column="use_record_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="deviceId" column="device_id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="itemNumber" column="item_number"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="endTime" column="end_time"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="totalLengthOfTime" column="total_length_of_time"/>
+                        <result property="nurseId" column="nurse_id"/>
+            </resultMap>
+</mapper>

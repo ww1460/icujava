@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.project.WarmJudgeMapper">
+
+	<resultMap id="WarmJudgeMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.project.WarmJudge">
+		<id property="id" column="id"/>
+		<result property="warmJudgeId" column="warm_judge_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="topValue" column="top_value"/>
+		<result property="bottomValue" column="bottom_value"/>
+		<result property="maxWarm" column="max_warm"/>
+		<result property="minWarm" column="min_warm"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+	</resultMap>
+
+	<sql id="Map_List_VO">
+		wj.id,wj.warm_judge_id,wj.project_id,wj.top_value,wj.bottom_value,wj.max_warm,wj.min_warm,pl.project_name,
+		pl.project_code
+	</sql>
+
+	<sql id="Map_List">
+		id,warm_judge_id,project_id,top_value,bottom_value,max_warm,min_warm,update_user_id,
+		update_time,create_user_id,create_time,del_flag,del_user_id,del_time
+	</sql>
+	<!--分页查询所有的新项目预警判断-->
+	<select id="selectByPage" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.project.WarmJudgeVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.project.WarmJudgeVo">
+
+		SELECT
+		<include refid="Map_List_VO"/>
+		FROM
+		nur_warm_judge wj
+		LEFT JOIN nur_project pl ON pl.project_id = wj.project_id
+		WHERE
+		pl.project_warm_flag = 0
+		AND pl.del_flag = 0
+		AND wj.del_flag = 0
+		<if test="query.projectCode != null and query.projectCode != ''">
+			and pl.project_code LIKE CONCAT('%',#{query.projectCode},'%')
+		</if>
+		<if test="query.projectName != null and query.projectName != ''">
+			and pl.project_name LIKE CONCAT('%',#{query.projectName},'%')
+		</if>
+		<if test="query.id != null">
+			and wj.id = #{query.id}
+		</if>
+		<if test="query.warmJudgeId != null">
+			and wj.warm_judge_id = #{query.warmJudgeId}
+		</if>
+	</select>
+
+	<!--根据项目id 查询对应的预警判断-->
+	<select id="selectByProjectId"  resultMap="WarmJudgeMap" parameterType="java.lang.String">
+
+		select
+		<include refid="Map_List"/>
+		from nur_warm_judge
+		where
+		del_flag = 0
+		and project_id = #{projectId}
+
+	</select>
+
+
+
+
+</mapper>

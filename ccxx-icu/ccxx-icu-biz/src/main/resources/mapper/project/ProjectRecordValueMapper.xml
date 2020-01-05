@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.project.ProjectRecordValueMapper">
+
+	<resultMap id="ProjectRecordValueMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectRecordValue">
+		<id property="id" column="id"/>
+		<result property="projectRecordValueId" column="project_record_value_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="recordValue" column="record_value"/>
+		<result property="remarks" column="remarks"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="dataFlag" column="data_flag"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+
+	<resultMap id="ProjectValue" type="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectValueVo">
+		<result property="projectId" column="project_id"/>
+		<result property="projectName" column="project_name"/>
+		<result property="projectCode" column="project_code"/>
+		<collection property="projectRecordValues" resultMap="ProjectRecordValueMap"/>
+	</resultMap>
+	<select id="selectProjectValue" resultMap="ProjectValue" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.project.Project">
+
+		SELECT
+			npl.project_id,
+			npl.project_name,
+			npl.project_code,
+			prv.id,
+			prv.project_id,
+			prv.record_value,
+			prv.project_record_value_id,
+			prv.data_flag,
+			prv.create_time,
+			prv.create_user_id,
+			prv.del_flag,
+			prv.remarks,
+			prv.update_time,
+			prv.update_user_id
+		FROM
+			nur_project_record_value prv
+		LEFT JOIN nur_project npl on npl.project_id = prv.project_id
+		WHERE
+			prv.del_flag = 0
+		and npl.del_flag = 0
+		and npl.project_record_value_flag = 0
+		<if test=" projectType !=null and projectId == null">
+			and npl.project_type = #{projectType}
+		</if>
+		<if test="projectId != null">
+			and npl.project_id = #{projectId}
+		</if>
+		<if test="deptId != null">
+			and npl.dept_id = #{deptId}
+		</if>
+	</select>
+
+	<select id="getProjectValue" resultMap="ProjectValue"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		SELECT
+		npl.project_id,
+		npl.project_name,
+		npl.project_code,
+		prv.id,
+		prv.project_id,
+		prv.record_value,
+		prv.project_record_value_id,
+		prv.data_flag,
+		prv.create_time,
+		prv.create_user_id,
+		prv.del_flag,
+		prv.remarks,
+		prv.update_time,
+		prv.update_user_id
+		FROM
+		nur_project_record_value prv
+		LEFT JOIN nur_project npl on npl.project_id = prv.project_id
+		left join nur_project_correlation pc on pc.project_id= npl.project_id
+		WHERE
+		prv.del_flag = 0
+		and npl.del_flag = 0
+		and npl.project_record_value_flag = 0
+		<if test=" nursingReportFlag !=null">
+			and pc.nursing_report_flag = #{nursingReportFlag}
+		</if>
+		<if test=" deptId !=null">
+			and pc.dept_id = #{deptId}
+		</if>
+	</select>
+
+
+	<!-- 通过雪花id查询数据 -->
+	<select id="getProjectRecordValueId" resultMap="GetProjectRecordValueIdMap" parameterType="java.lang.String">
+		select
+		id,
+		project_record_value_id,
+		project_id,
+		record_value,
+		data_flag,
+		remarks
+		 from nur_project_record_value
+		 where
+		 project_record_value_id = #{projectRecordValueId}
+	</select>
+
+	<resultMap id="GetProjectRecordValueIdMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectRecordValue">
+		<id property="id" column="id"/>
+		<result property="projectRecordValueId" column="project_record_value_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="recordValue" column="record_value"/>
+		<result property="remarks" column="remarks"/>
+		<result property="dataFlag" column="data_flag"/>
+	</resultMap>
+
+
+</mapper>

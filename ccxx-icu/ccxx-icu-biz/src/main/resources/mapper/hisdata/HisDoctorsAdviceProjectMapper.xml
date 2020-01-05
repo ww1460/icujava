@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.hisdata.HisDoctorsAdviceProjectMapper">
+
+	<!-- 通过医嘱批号查询数据 -->
+	<select id="selectBatchNumber" parameterType="java.lang.String" resultMap="hisDoctorsAdviceProjectMap">
+		select
+		pro.id,
+		pro.batch_number,
+		pro.doctors_advice_project_id,
+		pro.his_doctors_advice_id,
+		pro.his_doctors_advice_project_id,
+		pro.doctors_advice_project_type,
+		pro.content,
+		pro.drug_use,
+		pro.consumption,
+		pro.company,
+		pro.remarks
+		from his_doctors_advice_project pro
+		where
+		pro.batch_number = #{batchNumber}
+	</select>
+
+	<resultMap id="hisDoctorsAdviceProjectMap"
+			   type="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisDoctorsAdviceProject">
+		<id property="id" column="id"/>
+		<result property="doctorsAdviceProjectId" column="doctors_advice_project_id"/>
+		<result property="hisDoctorsAdviceProjectId" column="his_doctors_advice_project_id"/>
+		<result property="doctorsAdviceProjectType" column="doctors_advice_project_type"/>
+		<result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+		<result property="batchNumber" column="batch_number"/>
+		<result property="content" column="content"/>
+		<result property="drugUse" column="drug_use"/>
+		<result property="consumption" column="consumption"/>
+		<result property="company" column="company"/>
+		<result property="remarks" column="remarks"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

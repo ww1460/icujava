@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.piping.PipingMapper">
+
+
+	<sql id="pipingList">
+		pip.id,
+		pip.piping_id,
+		pip.piping_name,
+		pip.piping_type,
+		pip.manufacturer,
+		pip.date_of_storage,
+		pip.in_date,
+		pip.rfid,
+		pip.state,
+		pip.risklevel,
+		pip.drainage_id,
+		pip.dept_id,
+		pip.del_flag,
+		dra.drainage_name as draname
+	</sql>
+
+	<!-- 通过雪花管道id查询数据 -->
+	<select id="getPipingId" parameterType="java.lang.String" resultMap="pipPipingMapVo">
+
+		select
+		<include refid="pipingList"></include>
+		from  pip_piping pip
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+			 <where>
+				 <if test="piping.pipingId != null and piping.pipingId !=''">
+					 pip.piping_id = #{piping.pipingId}
+				 </if>
+			 </where>
+
+	</select>
+
+	<!-- 全查管路信息 -->
+	<select id="selectAll" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.Piping" resultMap="pipPipingMapVo">
+		select
+		<include refid="pipingList"></include>
+		from  pip_piping pip
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+		<where>
+			<if test="piping.deptId != null and piping.deptId !=''">
+				pip.dept_id = #{piping.deptId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.Piping" resultMap="pipPipingMapVo">
+		select
+		<include refid="pipingList"></include>
+		from  pip_piping pip
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+		<where>
+			pip.del_flag =0
+			<if test="piping.deptId != null and piping.deptId !=''">
+				and pip.dept_id = #{piping.deptId}
+
+			</if>
+			<if test="piping.pipingType != null and piping.pipingType !=''">
+				and pip.piping_type = #{piping.pipingType}
+			</if>
+			<if test="piping.pipingName != null and piping.pipingType !=''">
+				and pat.piping_name like CONCAT('%',#{patientBo.pipingName},'%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 在线管路数据 -->
+	<select id="getOnlinePipingNumber" resultMap="pipPipingMap">
+		select
+		*
+		from pip_piping pip
+		where pip.del_flag =0
+		and pip.state = 1
+	</select>
+
+	<resultMap id="pipPipingMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.piping.PipingVo">
+		<id property="id" column="id"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="pipingName" column="piping_name"/>
+		<result property="pipingType" column="piping_type"/>
+		<result property="manufacturer" column="manufacturer"/>
+		<result property="dateOfStorage" column="date_of_storage"/>
+		<result property="inDate" column="in_date"/>
+		<result property="rfid" column="rfid"/>
+		<result property="state" column="state"/>
+		<result property="risklevel" column="risklevel"/>
+		<result property="drainageId" column="drainage_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="drainageName" column="draname"/>
+	</resultMap>
+
+  <resultMap id="pipPipingMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.Piping">
+                  <id property="id" column="id"/>
+                        <result property="pipingId" column="piping_id"/>
+                        <result property="pipingName" column="piping_name"/>
+                        <result property="pipingType" column="piping_type"/>
+                        <result property="manufacturer" column="manufacturer"/>
+                        <result property="dateOfStorage" column="date_of_storage"/>
+                        <result property="inDate" column="in_date"/>
+                        <result property="rfid" column="rfid"/>
+                        <result property="state" column="state"/>
+                        <result property="risklevel" column="risklevel"/>
+                        <result property="drainageId" column="drainage_id"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

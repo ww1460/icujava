@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.KnowWritLogsMapper">
+
+	<resultMap id="KnowWritLogsMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.KnowWritLogs">
+		<id property="id" column="id"/>
+		<result property="knowWritLogsId" column="know_writ_logs_id"/>
+		<result property="knowWritId" column="know_writ_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="patientRelationSignature" column="patient_relation_signature"/>
+		<result property="patientRelation" column="patient_relation"/>
+		<result property="knowWritContent" column="know_writ_content"/>
+		<result property="patientRelativePhone" column="patient_relative_phone"/>
+		<result property="signatureTime" column="signature_time"/>
+		<result property="createTime" column="create_time"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+
+
+
+
+	<!--知情文书记录的分页查询-->
+	<select id="selectByPage" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.KnowWritLogsVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.KnowWritLogsBo">
+
+		SELECT
+			kwl.id,
+			kwl.know_writ_logs_id,
+			kwl.dept_id,
+			kwl.patient_name,
+			kwl.patient_id,
+			kwl.patient_relation,
+			kwl.know_writ_content,
+			kwl.patient_relation_signature,
+			kwl.patient_relative_phone,
+			kwl.signature_time,
+			kwl.create_user_id,
+			n.real_name as nurseName,
+			kw.writ_title
+		FROM
+			nur_know_writ_logs kwl
+		LEFT JOIN nur_know_writ kw ON kwl.know_writ_id = kw.know_writ_id and kw.del_flag = 0
+		left join nur_nurse n on n.nurse_id = kwl.create_user_id
+		WHERE
+			kwl.del_flag = 0
+		<if test="(query.patientId == null or query.patientId =='') and query.nurseId != null and query.nurseId != ''">
+			and kwl.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.nurseId}
+			)
+		</if>
+		<if test="query.deptId != null and query.deptId != ''">
+			AND kwl.dept_id = #{query.deptId}
+		</if>
+		<if test="query.patientId != null">
+			AND kwl.patient_id = #{query.patientId}
+		</if>
+
+		order by kwl.id desc
+	</select>
+
+</mapper>

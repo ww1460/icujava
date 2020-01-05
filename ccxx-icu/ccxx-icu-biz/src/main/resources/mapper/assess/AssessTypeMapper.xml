@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.assess.AssessTypeMapper">
+
+	<resultMap id="AssessTypeMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.assess.AssessType">
+		<id property="id" column="id"/>
+		<result property="assessTypeId" column="assess_type_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="projectType" column="project_type"/>
+		<result property="scoreMax" column="score_max"/>
+		<result property="scoreMin" column="score_min"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+
+
+	<!--评估项的类型及其项目和条件-->
+	<resultMap id="AssessProject" type="com.pig4cloud.pigx.ccxxicu.api.vo.assess.AssessProjectVo">
+
+		<id property="id" column="tid"/>
+		<result property="assessTypeId" column="assess_type_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="assessType" column="assess_type"/>
+		<result property="scoreMax" column="score_max"/>
+		<result property="scoreMin" column="score_min"/>
+		<collection property="assessProjects" resultMap="ProjectCondition"/>
+
+	</resultMap>
+
+
+	<!--评估的项目和条件-->
+	<resultMap id="ProjectCondition" type="com.pig4cloud.pigx.ccxxicu.api.vo.assess.ProjectConditionVo">
+		<id property="id" column="pid"/>
+		<result property="assessProjectId" column="assess_project_idd"/>
+		<result property="projectName" column="project_name"/>
+		<result property="projectCode" column="project_code"/>
+		<collection property="recordTime" ofType="java.time.LocalDateTime" javaType="list">
+			<result column="result_time"/>
+		</collection>
+		<collection property="pitchOnId" ofType="java.lang.String" javaType="list">
+			<result column="resultId"/>
+		</collection>
+		<collection property="projectConditions"
+					resultMap="com.pig4cloud.pigx.ccxxicu.mapper.assess.AssessConditionMapper.AssessConditionMap"/>
+	</resultMap>
+
+
+	<select id="getAssessData" resultMap="AssessProject">
+		SELECT
+			nat.id as tid,
+			nat.assess_type_id,
+			nat.project_id,
+			nat.project_type AS assess_type,
+			nat.score_max,
+			nat.score_min,
+			ap.id as pid,
+			ap.assess_project_id as assess_project_idd,
+			ap.assess_project_code AS project_code,
+			ap.assess_project_name AS project_name,
+			apr.assess_condition_id AS resultId,
+			apr.create_time as result_time,
+			ac.assess_condition_id,
+			ac.assess_condition,
+			ac.assess_result,
+			ac.assess_score,
+			ac.id ,
+			ac.assess_project_id
+		FROM
+			nur_assess_type nat
+		LEFT JOIN nur_assess_project ap ON ap.assess_type_id = nat.assess_type_id AND ap.del_flag = 0
+		LEFT JOIN nur_assess_condition ac ON ac.assess_project_id = ap.assess_project_id AND ac.del_flag = 0
+	 	LEFT JOIN nur_assess_project_record apr ON apr.assess_project_id = ap.assess_project_id and apr.del_flag = 0
+		AND apr.assess_record_id = (
+			SELECT
+				ar.assess_record_id
+			FROM
+				nur_assess_record ar
+			WHERE
+				ar.project_id = #{projectId}
+			AND ar.patient_id = #{patientId}
+			and ar.del_flag = 0
+			ORDER BY
+				ar.id desc
+			LIMIT 1
+		)
+
+		WHERE
+			nat.del_flag = 0
+		AND nat.project_id = #{projectId}
+		order by nat.id asc
+	</select>
+
+	<select id="assessRecord" resultMap="AssessProject" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.assess.AssessRecord">
+		SELECT
+			nat.id as tid,
+			nat.assess_type_id,
+			nat.project_id,
+			nat.project_type AS assess_type,
+			nat.score_max,
+			nat.score_min,
+			ap.id as pid,
+			ap.assess_project_id as assess_project_idd,
+			ap.assess_project_code AS project_code,
+			ap.assess_project_name AS project_name,
+			apr.assess_condition_id AS resultId,
+			apr.create_time as result_time,
+			ac.assess_condition_id,
+			ac.assess_condition,
+			ac.assess_result,
+			ac.assess_score,
+			ac.id ,
+			ac.assess_project_id
+		FROM
+			nur_assess_type nat
+		LEFT JOIN nur_assess_project ap ON ap.assess_type_id = nat.assess_type_id AND ap.del_flag = 0
+		LEFT JOIN nur_assess_condition ac ON ac.assess_project_id = ap.assess_project_id AND ac.del_flag = 0
+	 	LEFT JOIN nur_assess_project_record apr ON apr.assess_project_id = ap.assess_project_id and apr.del_flag = 0
+		AND apr.assess_record_id = #{assessRecordId}
+		WHERE
+			nat.del_flag = 0
+		AND nat.project_id = #{projectId}
+
+		order by nat.id asc
+	</select>
+
+
+	<!--评估项的类型及其项目和条件-->
+	<resultMap id="assessShow" type="com.pig4cloud.pigx.ccxxicu.api.vo.assess.AssessShowVo">
+
+		<id property="id" column="tid"/>
+		<result property="assessTypeId" column="assess_type_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="assessType" column="assess_type"/>
+		<result property="scoreMax" column="score_max"/>
+		<result property="scoreMin" column="score_min"/>
+		<collection property="assessProjects" resultMap="ConditionRecordVo"/>
+
+	</resultMap>
+
+
+	<!--评估的项目和条件-->
+	<resultMap id="ConditionRecordVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.assess.ConditionRecordVo">
+		<id property="id" column="pid"/>
+		<result property="assessProjectId" column="assess_project_idd"/>
+		<result property="projectName" column="project_name"/>
+		<result property="projectCode" column="project_code"/>
+		<collection property="pitchOnId" resultMap="com.pig4cloud.pigx.ccxxicu.mapper.assess.AssessProjectRecordMapper.AssessProjectRecordMap"/>
+		<collection property="projectConditions"
+					resultMap="com.pig4cloud.pigx.ccxxicu.mapper.assess.AssessConditionMapper.AssessConditionMap"/>
+	</resultMap>
+
+	<select id="getAssessRecord" resultMap="assessShow">
+
+		SELECT
+			nat.id as tid,
+			nat.assess_type_id,
+			nat.project_id,
+			nat.project_type AS assess_type,
+			nat.score_max,
+			nat.score_min,
+			ap.id as pid,
+			ap.assess_project_id as assess_project_idd,
+			ap.assess_project_code AS project_code,
+			ap.assess_project_name AS project_name,
+			ac.assess_condition_id,
+			ac.assess_condition,
+			ac.assess_result,
+			ac.assess_score,
+			ac.id ,
+			ac.assess_project_id
+		FROM
+			nur_assess_type nat
+		LEFT JOIN nur_assess_project ap ON ap.assess_type_id = nat.assess_type_id AND ap.del_flag = 0
+		LEFT JOIN nur_assess_condition ac ON ac.assess_project_id = ap.assess_project_id AND ac.del_flag = 0
+		WHERE
+			nat.del_flag = 0
+		AND nat.project_id = #{projectId}
+		order by nat.id asc
+
+	</select>
+
+</mapper>

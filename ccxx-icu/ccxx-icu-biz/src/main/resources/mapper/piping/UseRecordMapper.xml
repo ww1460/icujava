@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.piping.UseRecordsMapper">
+
+
+
+	<!--  数据查询连接中的设备 -->
+
+	<select id="selectInConnected"  resultMap="pipUseRecordsMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.UseRecord">
+		SELECT
+		rec.id,
+		rec.use_records_id,
+		rec.piping_id,
+		rec.body_parts,
+		rec.start_time,
+		rec.end_time,
+		rec.patient_id,
+		rec.nurse_id,
+		rec.fixed,
+		rec.length_builtin,
+		rec.length_exposure,
+		rec.sign_name,
+		rec.sign_color,
+		rec.local_condition,
+		rec.nursing_measures,
+		rec.dept_id,
+		rec.remark,
+		rec.del_flag,
+		pip.piping_name as pipname,
+		pat.`name` as patname,
+		nur.real_name as nurname,
+		dra.drainage_name as drainage_name
+		FROM pip_use_record rec
+		left join pip_piping pip on rec.piping_id = pip.piping_id
+		left join pat_patient pat on  rec.patient_id  = pat.patient_id
+		left join nur_nurse nur on  rec.nurse_id = nur.nurse_id
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+		<where>
+			rec.del_flag =0 and  rec.end_time is null
+			<if test="useRecord.patientId != null">
+				and rec.patient_id = #{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId != null">
+				and rec.dept_id = #{useRecord.deptId}
+			</if>
+		</where>
+		order by  rec.id desc
+	</select>
+
+	<!-- 数据条件查询分页 -->
+	<select id="selectPaging"  resultMap="pipUseRecordsMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.UseRecord">
+		SELECT
+		rec.id,
+		rec.use_records_id,
+		rec.piping_id,
+		rec.body_parts,
+		rec.start_time,
+		rec.end_time,
+		rec.patient_id,
+		rec.nurse_id,
+		rec.fixed,
+		rec.length_builtin,
+		rec.length_exposure,
+		rec.sign_name,
+		rec.sign_color,
+		rec.local_condition,
+		rec.nursing_measures,
+		rec.dept_id,
+		rec.remark,
+		rec.del_flag,
+		pip.piping_name as pipname,
+		pat.`name` as patname,
+		nur.real_name as nurname,
+		dra.drainage_name as drainage_name
+		FROM pip_use_record rec
+		left join pip_piping pip on rec.piping_id = pip.piping_id
+		left join pat_patient pat on  rec.patient_id  = pat.patient_id
+		left join nur_nurse nur on  rec.nurse_id = nur.nurse_id
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+		<where>
+			rec.del_flag =0
+			<if test="useRecord.patientId !=null">
+				and rec.patient_id = #{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId !=null">
+				and rec.dept_id = #{useRecord.deptId}
+			</if>
+
+		</where>
+		order by  rec.id desc
+	</select>
+
+
+	<!-- 数据条件查询 -->
+	<select id="selectAll"  resultMap="pipUseRecordsMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.piping.UseRecordVo">
+		SELECT
+		rec.id,
+		rec.use_records_id,
+		rec.piping_id,
+		rec.body_parts,
+		rec.start_time,
+		rec.end_time,
+		rec.patient_id,
+		rec.nurse_id,
+		rec.fixed,
+		rec.length_builtin,
+		rec.length_exposure,
+		rec.sign_name,
+		rec.sign_color,
+		rec.local_condition,
+		rec.nursing_measures,
+		rec.dept_id,
+		rec.remark,
+		rec.del_flag,
+		pip.piping_name as pipname,
+		pat.`name` as patname,
+		nur.real_name as nurname,
+		dra.drainage_name as drainage_name
+		FROM pip_use_record rec
+		left join pip_piping pip on rec.piping_id = pip.piping_id
+		left join pat_patient pat on  rec.patient_id  = pat.patient_id
+		left join nur_nurse nur on  rec.nurse_id = nur.nurse_id
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+		where
+			rec.del_flag =0
+			<if test="useRecord.patientId !=null">
+				and rec.patient_id = #{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId !=null">
+				and rec.dept_id = #{useRecord.deptId}
+			</if>
+			<if test="useRecord.sTime !=null and useRecord.eTime !=null">
+				and (rec.end_time is null or rec.end_time between #{useRecord.sTime} and #{useRecord.eTime})
+			</if>
+			<if test="useRecord.nurseId !=null">
+				and rec.patient_id in (
+				SELECT  cor.patient_id FROM nur_nurse_patient_correlation cor
+				where cor.nurse_id = #{useRecord.nurseId})
+			</if>
+
+		order by  rec.id desc
+	</select>
+
+
+
+	<!-- 条件数据全查查询患者以使用的管道 -->
+	<select id="selectUsedAll"  resultMap="pipUseRecordsMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.UseRecord">
+		SELECT
+		rec.id,
+		rec.use_records_id,
+		rec.piping_id,
+		rec.body_parts,
+		rec.start_time,
+		rec.end_time,
+		rec.patient_id,
+		rec.nurse_id,
+		rec.fixed,
+		rec.length_builtin,
+		rec.length_exposure,
+		rec.sign_name,
+		rec.sign_color,
+		rec.local_condition,
+		rec.nursing_measures,
+		rec.dept_id,
+		rec.remark,
+		rec.del_flag,
+		pip.piping_name as pipname,
+		pat.`name` as patname,
+		nur.real_name as nurname,
+		dra.drainage_name as drainage_name
+		FROM pip_use_record rec
+		left join pip_piping pip on rec.piping_id = pip.piping_id
+		left join pat_patient pat on  rec.patient_id  = pat.patient_id
+		left join nur_nurse nur on  rec.nurse_id = nur.nurse_id
+		left join pip_drainage dra on pip.drainage_id = dra.drainage_id
+		<where>
+			rec.del_flag =0 and rec.end_time is not null
+			<if test="useRecord.patientId !=null">
+				and rec.patient_id = #{useRecord.patientId}
+			</if>
+			<if test="useRecord.deptId !=null">
+				and rec.dept_id = #{useRecord.deptId}
+			</if>
+		</where>
+		order by  rec.id desc
+	</select>
+
+
+	<resultMap id="pipUseRecordsMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.piping.UseRecordVo">
+		<id property="id" column="id"/>
+		<result property="useRecordsId" column="use_records_id"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="bodyParts" column="body_parts"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="fixed" column="fixed"/>
+		<result property="lengthBuiltin" column="length_builtin"/>
+		<result property="lengthExposure" column="length_exposure"/>
+		<result property="signName" column="sign_name"/>
+		<result property="signColor" column="sign_color"/>
+		<result property="localCondition" column="local_condition"/>
+		<result property="nursingMeasures" column="nursing_measures"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="remark" column="remark"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="patientName" column="patname"/>
+		<result property="pipingName" column="pipname"/>
+		<result property="nurseName" column="nurname"/>
+		<result property="drainageName" column="drainage_name"/>
+
+	</resultMap>
+
+
+	<!-- 通过患者id查询当前患者连接的管路 用于患者出科-->
+	<select id="stopPiping" parameterType="java.lang.String" resultMap="stopPipingMap">
+		select
+		id,
+		use_records_id,
+		piping_id,
+		patient_id,
+		del_flag,
+		start_time,
+		end_time
+		 from pip_use_record
+		 <where>
+			 end_time is null and del_flag = 0
+			 <if test="patientId !=null">
+				and patient_id =#{patientId}
+			 </if>
+		 </where>
+
+	</select>
+
+	<!--用于护理记录单二的展示-->
+	<select id="ReportTwo" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.piping.PipUseTime">
+
+		SELECT
+			min(ur.start_time) as startTime,
+			pp.piping_name as pipName
+		FROM
+			pip_use_record ur
+		LEFT JOIN pip_piping pp on  pp.piping_id = ur.piping_id
+		where
+			ur.patient_id = #{patientId}
+		GROUP BY pp.piping_name
+
+	</select>
+
+
+	<resultMap id="stopPipingMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.UseRecord">
+		<id property="id" column="id"/>
+		<result property="useRecordsId" column="use_records_id"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="delFlag" column="del_flag"/>
+	</resultMap>
+
+
+
+
+
+	<resultMap id="pipUseRecordsMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.UseRecord">
+		<id property="id" column="id"/>
+		<result property="useRecordsId" column="use_records_id"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="bodyParts" column="body_parts"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="lengthBuiltin" column="length_builtin"/>
+		<result property="lengthExposure" column="length_exposure"/>
+		<result property="signName" column="sign_name"/>
+		<result property="signColor" column="sign_color"/>
+		<result property="localCondition" column="local_condition"/>
+		<result property="nursingMeasures" column="nursing_measures"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="remark" column="remark"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

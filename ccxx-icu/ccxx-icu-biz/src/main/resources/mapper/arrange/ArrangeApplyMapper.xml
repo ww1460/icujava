@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.arrange.ArrangeApplyMapper">
+
+	<resultMap id="ArrangeApplyMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.arrange.ArrangeApply">
+		<id property="id" column="id"/>
+		<result property="arrangeApplyId" column="arrange_apply_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="initiatorNurseId" column="initiator_nurse_id"/>
+		<result property="initiatorNurseName" column="initiator_nurse_name"/>
+		<result property="originalShift" column="original_shift"/>
+		<result property="hopeShift" column="hope_shift"/>
+		<result property="applyType" column="apply_type"/>
+		<result property="changeNurseId" column="change_nurse_id"/>
+		<result property="changeNurseName" column="change_nurse_name"/>
+		<result property="applyReason" column="apply_reason"/>
+		<result property="approvalFlag" column="approval_flag"/>
+		<result property="dateTime" column="date_time"/>
+		<result property="approvalOpinion" column="approval_opinion"/>
+		<result property="createTime" column="create_time"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+	</resultMap>
+
+
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.arrange.ArrangeApply" resultMap="ArrangeApplyMap">
+
+		select
+		*
+		from
+		nur_arrange_apply
+		where
+		del_flag = 0
+		<if test="query.deptId !=null">
+			and dept_id =#{query.deptId}
+		</if>
+		<if test="query.initiatorNurseId !=null">
+			and  initiator_nurse_id = #{query.initiatorNurseId}
+		</if>
+		<if test="query.applyType !=null">
+			and  apply_type =#{query.applyType}
+		</if>
+		<if test="query.approvalFlag !=null">
+			and  approval_flag = #{query.approvalFlag}
+		</if>
+		<if test="query.dateTime != null">
+			and  date_format(date_time,'%Y-%m-%d') >= date_format(#{query.dateTime},'%Y-%m-%d')
+		</if>
+		order by initiator_nurse_id desc,create_time desc
+
+	</select>
+
+
+
+
+
+</mapper>

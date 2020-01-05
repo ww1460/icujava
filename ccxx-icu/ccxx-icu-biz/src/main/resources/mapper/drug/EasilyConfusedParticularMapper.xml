@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.drug.EasilyConfusedParticularMapper">
+
+	<resultMap id="EasilyConfusedParticularMap"
+			   type="com.pig4cloud.pigx.ccxxicu.api.entity.drug.EasilyConfusedParticular">
+		<id property="id" column="id"/>
+		<result property="easilyConfusedParticularId" column="easily_confused_particular_id"/>
+		<result property="easilyConfusedCatalogId" column="easily_confused_catalog_id"/>
+		<result property="drugName" column="drug_name"/>
+		<result property="drugPicture" column="drug_picture"/>
+		<result property="drugSpecification" column="drug_specification"/>
+		<result property="drugType" column="drug_type"/>
+		<result property="drugIndications" column="drug_indications"/>
+		<result property="pharmacologicalAction" column="pharmacological_action"/>
+		<result property="adverseReaction" column="adverse_reaction"/>
+		<result property="drugTaboo" column="drug_taboo"/>
+		<result property="remarks" column="remarks"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+	<sql id="Map_List">
+  		 ecp.id,
+		 ecp.easily_confused_particular_id,
+		 ecp.easily_confused_catalog_id,
+		 ecp.drug_name,
+		 ecp.drug_picture,
+		 ecp.drug_specification,
+		 ecp.drug_type,
+		 ecp.drug_indications,
+		 ecp.pharmacological_action,
+		 ecp.adverse_reaction,
+		 ecp.drug_taboo,
+		 ecp.remarks,
+		 ecp.create_user_id,
+		 ecp.create_time,
+		 ecp.del_flag,
+		 ecp.del_time,
+		 ecp.del_user_id,
+		 ecp.update_time,
+		 ecp.update_user_id
+	</sql>
+
+	<select id="getList" resultMap="EasilyConfusedParticularMap">
+
+		select
+		<include refid="Map_List"/>
+		from drug_easily_confused_particular ecp
+		where ecp.del_flag = 0
+		and ecp.easily_confused_catalog_id =#{easilyConfusedCatalogId}
+
+	</select>
+
+</mapper>

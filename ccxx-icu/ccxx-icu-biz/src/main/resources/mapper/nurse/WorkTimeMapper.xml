@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.WorkTimeMapper">
+
+	<resultMap id="WorkTimeMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.WorkTime">
+		<id property="id" column="id"/>
+		<result property="workTimeId" column="work_time_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="bedId" column="bed_id"/>
+		<result property="position" column="position"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="timeCount" column="time_count"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+
+	<!--按床位护士查询合计数据-->
+	<select id="groupByBed" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.WorkTimeBo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.WorkTimeVo">
+		SELECT
+		hb.bed_code,
+		SUM(wt.time_count) as count
+		from
+		nur_work_time wt
+		LEFT JOIN nur_hospital_bed hb on hb.bed_id = wt.bed_id
+		WHERE
+		wt.del_flag = 0
+		AND wt.user_id = #{nurseId}
+		<if test=" timeFlag = 1  and firstTime != null">
+			and DATE_FORMAT(wt.start_time,'%Y-%m-%d') = DATE_FORMAT(#{firstTime},'%Y-%m-%d')
+		</if>
+		<if test=" timeFlag = 2  and firstTime != null">
+			and DATE_FORMAT(wt.start_time,'%Y-%m') = DATE_FORMAT(#{firstTime},'%Y-%m')
+		</if>
+		<if test=" timeFlag = 3  and firstTime != null">
+			and YEARWEEK( date_format(wt.start_time,'%Y-%m-%d') ) = YEARWEEK(#{firstTime})
+		</if>
+		GROUP BY wt.bed_id
+	</select>
+
+	<select id="getNewRecord" resultMap="WorkTimeMap"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.WorkTime">
+		select * from
+		nur_work_time
+		where
+			end_Time is null
+		<if test="bedId != null" >
+			and bed_id= #{bedId}
+		</if>
+		<if test="userId != null" >
+			and user_id = #{userId}
+		</if>
+		order by id desc
+		limit 1
+
+	</select>
+
+
+</mapper>

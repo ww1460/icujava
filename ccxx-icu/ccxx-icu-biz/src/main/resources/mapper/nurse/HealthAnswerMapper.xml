@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.HealthAnswerMapper">
+
+	<resultMap id="nurHealthAnswerMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.HealthAnswer">
+		<id property="id" column="id"/>
+		<result property="healthAnswerId" column="health_answer_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="indicatorValue" column="indicator_value"/>
+		<result property="assessTime" column="assess_time"/>
+		<result property="healthSubjectId" column="health_subject_id"/>
+		<result property="matronId" column="matron_id"/>
+		<result property="indicatorValueOfMatron" column="indicator_value_of_matron"/>
+		<result property="assessTimeOfMatorn" column="assess_time_of_matorn"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+	<sql id="Map_List">
+		ha.id,ha.health_answer_id,ha.nurse_id,ha.indicator_value,ha.assess_time,ha.health_subject_id,
+		ha.matron_id,ha.indicator_value_of_matron,
+		ha.assess_time_of_matorn,ha.dept_id,hs.indicator,hs.indicator_script,n.real_name as nurse_name,
+		nn.real_name as matron_name
+	</sql>
+
+	<!--护士长查看护士的个人评估-->
+	<select id="selectByPage" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.HealthAnswerVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.HealthAnswerBo">
+
+		SELECT
+			<include refid="Map_List"/>
+		FROM
+			nur_health_answer ha
+		LEFT JOIN nur_health_subject hs ON hs.health_subject_id = ha.health_subject_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = ha.nurse_id
+		LEFT JOIN nur_nurse nn ON nn.nurse_id = ha.matron_id
+		<where>
+			hs.del_flag = 0
+		AND ha.del_flag = 0
+		AND n.del_flag = 0
+		<if test="query.realName != null">
+		and	n.real_name LIKE CONCAT('%',#{query.realName},'%')
+		</if>
+		<if test="query.nurseId" >
+		and	ha.nurse_id = #{query.nurseId}
+		</if>
+		<if test="query.startTime != null">
+		and ha.assess_time >= #{query.startTime}
+		</if>
+		<if test="query.endTime != null">
+			and  #{query.endTime} >= ha.assess_time
+		</if>
+		</where>
+		order by ha.assess_time desc
+	</select>
+
+	<select id="selectNow" resultType="java.lang.String" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.HealthAnswerBo">
+
+		SELECT
+		health_subject_id
+		FROM
+		nur_health_answer
+		WHERE
+		del_flag = 0
+		<if test="nurseId" >
+			and	nurse_id = #{nurseId}
+		</if>
+		<if test="startTime != null">
+			and assess_time >= #{startTime}
+		</if>
+		<if test="endTime != null">
+			and  #{endTime} >= assess_time
+		</if>
+		order by assess_time desc
+	</select>
+
+
+	<!--通过id查询 单个评估记录-->
+	<select id="getById" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.HealthAnswerVo" parameterType="java.lang.Integer">
+		SELECT
+		<include refid="Map_List"/>
+		FROM
+		nur_health_answer ha
+		LEFT JOIN nur_health_subject hs ON hs.health_subject_id = ha.health_subject_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = ha.nurse_id
+		LEFT JOIN nur_nurse nn ON nn.nurse_id = ha.matron_id
+		WHERE
+		hs.del_flag = 0
+		AND ha.del_flag = 0
+		AND n.del_flag = 0
+		and ha.id =#{id}
+	</select>
+
+	<select id="getBySubject" resultMap="nurHealthAnswerMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="Map_List"/>
+		FROM
+		nur_health_answer ha
+		LEFT JOIN nur_health_subject hs ON hs.health_subject_id = ha.health_subject_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = ha.nurse_id
+		LEFT JOIN nur_nurse nn ON nn.nurse_id = ha.matron_id
+		WHERE
+		hs.del_flag = 0
+		AND ha.del_flag = 0
+		AND n.del_flag = 0
+		and ha.health_subject_id =#{healthSujectId}
+		order by ha.assess_time desc
+	</select>
+
+
+	<select id="selectByNurse" resultType= "com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.HealthAnswerVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.HealthAnswer">
+
+		select
+		<include refid="Map_List"/>
+		FROM
+		nur_health_answer ha
+		LEFT JOIN nur_health_subject hs ON hs.health_subject_id = ha.health_subject_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = ha.nurse_id
+		LEFT JOIN nur_nurse nn ON nn.nurse_id = ha.matron_id
+		<where>
+		hs.del_flag = 0
+		AND ha.del_flag = 0
+		AND n.del_flag = 0
+		and	ha.nurse_id = #{nurseId}
+		</where>
+		order by ha.assess_time desc
+
+	</select>
+
+
+
+
+</mapper>

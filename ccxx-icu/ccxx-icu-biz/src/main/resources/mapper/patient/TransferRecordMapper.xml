@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.TransferRecordMapper">
+
+	<resultMap id="TransferRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.TransferRecord">
+		<id property="id" column="id"/>
+		<result property="transferRecordId" column="transfer_record_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="patientAge" column="patient_age"/>
+		<result property="patientSex" column="patient_sex"/>
+		<result property="patientDiagnose" column="patient_diagnose"/>
+		<result property="patientAdmissionNumber" column="patient_admission_number"/>
+		<result property="patientTemperature" column="patient_temperature"/>
+		<result property="patientBreathe" column="patient_breathe"/>
+		<result property="patientPulse" column="patient_pulse"/>
+		<result property="patientBloodPressure" column="patient_blood_pressure"/>
+		<result property="patientPain" column="patient_pain"/>
+		<result property="patientConsciousness" column="patient_consciousness"/>
+		<result property="patientPsychological" column="patient_psychological"/>
+		<result property="patientPsychologicalRemarks" column="patient_psychological_remarks"/>
+		<result property="patientCareOneself" column="patient_care_oneself"/>
+		<result property="patientSkinMucosa" column="patient_skin_mucosa"/>
+		<result property="patientSkinMucosaRemarks" column="patient_skin_mucosa_remarks"/>
+		<result property="patientPressure" column="patient_pressure"/>
+		<result property="patientPressureRemarks" column="patient_pressure_remarks"/>
+		<result property="patientTransfusion" column="patient_transfusion"/>
+		<result property="patientTransfusionRemarks" column="patient_transfusion_remarks"/>
+		<result property="patientDrugDelivery" column="patient_drug_delivery"/>
+		<result property="patientDrugDeliveryRemarks" column="patient_drug_delivery_remarks"/>
+		<result property="patientPipeline" column="patient_pipeline"/>
+		<result property="patientWound" column="patient_wound"/>
+		<result property="patientWoundRemarks" column="patient_wound_remarks"/>
+		<result property="patientOthers" column="patient_others"/>
+		<result property="patientDischargeDept" column="patient_discharge_dept"/>
+		<result property="patientDischargeTime" column="patient_discharge_time"/>
+		<result property="nurseName" column="nurse_name"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

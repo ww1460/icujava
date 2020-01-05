@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.PersonalNotesMapper">
+
+  <resultMap id="nurPersonalNotesMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.PersonalNotes">
+                  <id property="id" column="id"/>
+                        <result property="personalNotesId" column="personal_notes_id"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="content" column="content"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delUser" column="del_user"/>
+                        <result property="delTime" column="del_time"/>
+            </resultMap>
+
+	<sql id="List_Map">
+		id,personal_notes_id,user_id,content,create_time,del_flag,del_user,del_time
+	</sql>
+	<!--根据时间段查询  主要是查询该月-->
+	<select id="selectByDate" parameterType="java.lang.String" resultMap="nurPersonalNotesMap">
+
+		select
+		<include refid="List_Map"/>
+		from nur_personal_notes
+		where
+		del_flag = 0
+		and
+		date_format(create_time,'%Y-%m')= date_format(#{createTime},'%Y-%m')
+		and user_id = #{userId}
+		order by create_time asc
+
+	</select>
+
+
+	<!--查询护士某天的笔记-->
+	<select id="getByDay" parameterType="java.lang.String" resultMap="nurPersonalNotesMap">
+		select
+		<include refid="List_Map"/>
+		from nur_personal_notes
+		where
+		del_flag = 0
+		and
+		date_format(create_time,'%Y-%m-%d')= date_format(#{createTime},'%Y-%m-%d')
+		and user_id = #{userId}
+		order by create_time asc
+	</select>
+
+
+
+
+</mapper>

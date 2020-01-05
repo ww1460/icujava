@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.NursePatientCorrelationMapper">
+
+
+	<!-- 条件数据全查  -->
+	<select id="selectAll" resultMap="nurNursePatientCorrelationMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.NursePatientCorrelation">
+		select
+		cor.id,
+		cor.patient_id,
+		cor.nurse_id,
+		cor.dept_id,
+		cor.only_duty_nurse,
+		pat.name as patname,
+		nur.real_name as nursName,
+		bed.bed_name
+		from nur_nurse_patient_correlation cor
+		left join pat_patient pat on cor.patient_id  = pat.patient_id
+		left join nur_nurse nur on cor.nurse_id = nur.nurse_id
+		left join nur_hospital_bed bed on pat.admission_beds = bed.bed_id
+		<where>
+				pat.entry_state = 2
+			<if test="nursePatientCorrelation.patientId !=null">
+				and  cor.patient_id = #{nursePatientCorrelation.patientId}
+			</if>
+			<if test="nursePatientCorrelation.nurseId !=null">
+				and cor.nurse_id = #{nursePatientCorrelation.nurseId}
+			</if>
+			<if test="nursePatientCorrelation.onlyDutyNurse !=null">
+				and cor.only_duty_nurse = #{nursePatientCorrelation.onlyDutyNurse}
+			</if>
+			<if test="nursePatientCorrelation.deptId !=null">
+				and cor.dept_id = #{nursePatientCorrelation.deptId}
+			</if>
+		</where>
+	</select>
+
+		<!-- 通过患者id查询责任护士 -->
+		<select id="responsibleNurse" resultMap="nurNursePatientCorrelationMap" parameterType="java.lang.String">
+		select
+				id,
+				patient_id,
+				nurse_id,
+				dept_id,
+				only_duty_nurse
+				from nur_nurse_patient_correlation
+		<where>
+			only_duty_nurse =0
+			<if test="patientId !=null">
+				and	patient_id = #{patientId}
+			</if>
+		</where>
+
+		</select>
+
+	<!-- 用患者id 查询当前看护患者的护士   用于出科 -->
+
+		<select id="currentCarePatientNurse" parameterType="java.lang.String" resultMap="nurNursePatientCorrelationMap">
+			select
+				id,
+				patient_id,
+				nurse_id,
+				dept_id,
+				only_duty_nurse
+				from nur_nurse_patient_correlation
+				<where>
+					<if test="patientId !=null">
+						and	patient_id = #{patientId}
+					</if>
+				</where>
+		</select>
+	
+
+
+	<resultMap id="nurNursePatientCorrelationMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.NursePatientCorrelationVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="onlyDutyNurse" column="only_duty_nurse"/>
+		<result property="patientName" column="patname"/>
+		<result property="nurseName" column="nursName"/>
+		<result property="bedName" column="bed_name"/>
+<!--		<result property="allergichistory" column="allergichistory"/>-->
+
+	</resultMap>
+
+    <resultMap id="nurNursePatientCorrelationMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.NursePatientCorrelation">
+                  <id property="id" column="id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="nurseId" column="nurse_id"/>
+	 					 <result property="deptId" column="dept_id"/>
+	  					<result property="onlyDutyNurse" column="only_duty_nurse"/>
+    </resultMap>
+
+	<!-- 根据护士ID查询患者列表 -->
+	<select id="selectPatientsByNurseId" resultMap="nurNursePatientCorrelationMapVo" parameterType="java.lang.String">
+		select
+		cor.id,
+		cor.patient_id,
+		cor.nurse_id,
+		cor.dept_id,
+		cor.only_duty_nurse,
+		pat.name as patname,
+		nur.real_name as nursName
+		from nur_nurse_patient_correlation cor
+		left join pat_patient pat on cor.patient_id  = pat.patient_id
+		left join nur_nurse nur on cor.nurse_id = nur.nurse_id
+		<where>
+			<if test="nurseId != null">
+				cor.nurse_id = #{nurseId}
+			</if>
+		</where>
+	</select>
+
+
+
+	<!--查询对应条件的患者id-->
+	<select id="getPatientId" resultType="java.lang.String">
+
+		select
+			distinct pat.patient_id
+		from pat_patient pat
+		<if test="nurseId !=null ">
+		left join  nur_nurse_patient_correlation cor on cor.patient_id  = pat.patient_id
+		</if>
+		where
+			pat.del_flag = 0
+		and pat.entry_state = 2
+		<if test="nurseId !=null ">
+			and cor.nurse_id = #{nurseId}
+		</if>
+		<if test="deptId != null and nurseId ==null">
+			and pat.admission_department = #{deptId}
+		</if>
+	</select>
+
+	<!-- 数据大屏-获取在线护士数 -->
+
+	<select id="selectOnlineNurse" resultMap="nurNursePatientCorrelationMap">
+		select distinct
+		nurse_id
+		from nur_nurse_patient_correlation
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.project.ProjectCorrelationMapper">
+
+	<resultMap id="ProjectCorrelationMap"
+			   type="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectCorrelation">
+		<id property="id" column="id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="nursingReportFlag" column="nursing_report_flag"/>
+		<result property="showWayFlag" column="show_way_flag"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="showIndex" column="show_index"/>
+	</resultMap>
+
+	<select id="selectReportProject" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectCorrelationVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectCorrelation">
+
+		SELECT
+		pl.id,
+		pl.project_id,
+		pl.project_name,
+		pl.project_code,
+		pl.project_type,
+		pl.project_warm_flag,
+		pl.illness_nursing_flag,
+		pl.project_record_value_flag,
+		pl.del_flag,
+		pl.del_user_id,
+		pl.del_time,
+		pl.update_user_id,
+		pl.update_time,
+		pl.create_time,
+		pl.create_user_id,
+		pc.show_way_flag,
+		pc.id as correlationId,
+		pc.show_index
+		FROM
+		nur_project_correlation pc
+		LEFT JOIN nur_project pl ON pl.project_id = pc.project_id
+		WHERE
+		pl.del_flag = 0
+		<if test="nursingReportFlag !=null ">
+			and pc.nursing_report_flag = #{nursingReportFlag}
+		</if>
+		<if test="deptId !=null ">
+			and pc.dept_id = #{deptId}
+		</if>
+		order by pc.show_index
+	</select>
+
+
+</mapper>

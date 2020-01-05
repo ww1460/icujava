@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.EntrustMapper">
+
+
+	<!-- 任务委托查询 -->
+	<select id="selectPaging" resultMap="takEntrustMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.Entrust">
+		select
+			e.id,
+			e.task_entrust_id,
+			e.originator_id,
+			e.recipient_id,
+			e.task_id,
+			e.time,
+			n.real_name as n_name,
+			nu.real_name as nu_name,
+			t.task_name as task_name,
+			t.task_describe as task_describe
+			from tak_entrust e
+			left join nur_nurse n on e.originator_id = n.nurse_id
+			left join nur_nurse nu on e.recipient_id = nu.nurse_id
+			left join tak_task t on e.task_id = t.task_id
+			<where>
+				<if test="entrust.originatorId != null">
+					e.originator_id = #{entrust.originatorId}
+				</if>
+				<if test="entrust.recipientId != null">
+					and e.recipient_id = #{entrust.recipientId}
+				</if>
+			</where>
+
+	</select>
+
+
+
+	<resultMap id="takEntrustMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.EntrustVo">
+		<id property="id" column="id"/>
+		<result property="taskEntrustId" column="task_entrust_id"/>
+		<result property="originatorId" column="originator_id"/>
+		<result property="recipientId" column="recipient_id"/>
+		<result property="taskId" column="task_id"/>
+		<result property="time" column="time"/>
+
+		<result property="originatorNurseName" column="n_name"/>
+		<result property="recipientNurseName" column="nu_name"/>
+		<result property="taskName" column="task_name"/>
+		<result property="taskDescribe" column="task_describe"/>
+	</resultMap>
+
+
+  <resultMap id="takEntrustMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.Entrust">
+                  <id property="id" column="id"/>
+                        <result property="taskEntrustId" column="task_entrust_id"/>
+                        <result property="originatorId" column="originator_id"/>
+                        <result property="recipientId" column="recipient_id"/>
+                        <result property="taskId" column="task_id"/>
+                        <result property="time" column="time"/>
+            </resultMap>
+</mapper>

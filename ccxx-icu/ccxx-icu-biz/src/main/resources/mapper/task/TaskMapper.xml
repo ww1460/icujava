@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.TaskMapper">
+
+
+
+
+
+
+
+
+
+	<!--
+	select
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.state,
+		task.progress_bar,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag,
+		pat.name as patname,
+		nur.real_name as nurname
+		from tak_task task
+		left join pat_patient pat  on task.patient_id= pat.patient_id
+		left join nur_nurse nur on  task.completed_nurse_id = nur.nurse_id
+		<where>
+			task.del_flag =0
+			<if test="task.deptId != null">
+				and  task.dept_id = #{task.deptId}
+			</if>
+			<if test="task.state != null">
+				and  task.state = #{task.state}
+			</if>
+			<if test="task.patientId !=null">
+				and task.patient_id = #{task.patientId}
+			</if>
+		</where>
+		and task.patient_id in (
+		SELECT  cor.patient_id FROM nur_nurse_patient_correlation cor
+		<where>
+			<if test="task.associatedNurse!=null">
+				and cor.nurse_id = #{task.associatedNurse}
+			</if>
+		</where>
+		)
+	-->
+
+
+
+
+
+
+
+
+
+
+	<!--  分页查询任务 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TaskVo" resultMap="takTaskMapVo">
+		select
+		distinct task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.state,
+		task.progress_bar,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag,
+		pat.name as patname,
+		nur.real_name as nurname
+		from tak_task task
+		left join pat_patient pat  on task.patient_id= pat.patient_id
+		left join nur_nurse nur on  task.completed_nurse_id = nur.nurse_id
+		<where>
+			task.del_flag =0
+			<if test="task.deptId != null">
+				and  task.dept_id = #{task.deptId}
+			</if>
+			<if test="task.state != null">
+				and  task.state = #{task.state}
+			</if>
+			<if test="task.patientId !=null">
+				and task.patient_id = #{task.patientId}
+			</if>
+			<if test="task.associatedNurse != null">
+				and  (task.duty_nurse_id = #{task.associatedNurse} or  task.reception_nurse_id = #{task.associatedNurse})
+			</if>
+		</where>
+		ORDER BY task.state ,task.emergency desc ,task.id desc
+	</select>
+
+	<!-- 数据全查  -->
+	<select id="selectAll" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TaskVo" resultMap="takTaskMapVo">
+		select
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.state,
+		task.progress_bar,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag,
+		pat.name as patname,
+		nur.real_name as nurname
+		from tak_task task
+		left join pat_patient pat  on task.patient_id= pat.patient_id
+		left join nur_nurse nur on  task.completed_nurse_id = nur.nurse_id
+		<where>
+			task.del_flag =0
+			<if test="task.deptId != null">
+				and  task.dept_id = #{task.deptId}
+			</if>
+			<if test="task.state != null">
+				and  task.state = #{task.state}
+			</if>
+			<if test="task.patientId !=null">
+				and task.patient_id = #{task.patientId}
+			</if>
+			<if test="task.sourceItemsId !=null">
+				and task.source_items_id = #{task.sourceItemsId}
+			</if>
+		</where>
+		and task.patient_id in (
+		SELECT  cor.patient_id FROM nur_nurse_patient_correlation cor
+		<where>
+			<if test="task.associatedNurse!=null">
+				and cor.nurse_id = #{task.associatedNurse}
+			</if>
+		</where>
+		)
+		ORDER BY task.state ,task.emergency desc ,task.id  desc
+	</select>
+
+	<!-- id查询 -->
+	<select id="selectId" parameterType="java.lang.Integer" resultMap="takTaskMapVo">
+		select
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.state,
+		task.progress_bar,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag,
+		pat.name as patname,
+		nur.real_name as nurname,
+		nurs.real_name as nursname,
+		nurss.real_name as nurssname
+		from tak_task task
+		left join pat_patient pat on task.patient_id = pat.patient_id
+		left join nur_nurse nur on  task.completed_nurse_id = nur.nurse_id
+		left join nur_nurse nurs on  task.reception_nurse_id = nurs.nurse_id
+		left join nur_nurse nurss on  task.creator_id = nurss.nurse_id
+		<where>
+			task.del_flag =0
+			<if test="id != null">
+				and  task.id = #{id}
+			</if>
+
+		</where>
+		ORDER BY task.id  desc
+	</select>
+
+	<!-- 雪花id查询 -->
+	<select id="getTaskId" parameterType="java.lang.String" resultMap="takTaskMapVo">
+		select
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.state,
+		task.progress_bar,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag,
+		pat.name as patname,
+		nur.real_name as nurname,
+		nurs.real_name as nursname,
+		nurss.real_name as nurssname
+		from tak_task task
+		left join pat_patient pat on task.patient_id = pat.patient_id
+		left join nur_nurse nur on  task.completed_nurse_id = nur.nurse_id
+		left join nur_nurse nurs on  task.reception_nurse_id = nurs.nurse_id
+		left join nur_nurse nurss on  task.creator_id = nurss.nurse_id
+		<where>
+			task.del_flag =0
+			<if test="taskId != null">
+				and  task.task_id = #{taskId}
+			</if>
+		</where>
+		ORDER BY task.id  desc
+	</select>
+
+	<!--  通过患者id查询当前患者未完成的任务 -->
+	<select id="stopTask" parameterType="java.lang.String" resultMap="stopTaskMap">
+		select
+		id,
+		task_id,
+		state,
+		patient_id
+		from tak_task
+		<where>
+			state != 3 and  state != 4 and del_flag=0
+			<if test="patientId !=null">
+				and patient_id = #{patientId}
+			</if>
+		</where>
+	</select>
+
+	<resultMap id="stopTaskMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.TaskVo">
+		<id property="id" column="id"/>
+		<result property="taskId" column="task_id"/>
+
+		<result property="patientId" column="patient_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="state" column="state"/>
+
+	</resultMap>
+
+	<!-- 查询超时未完成的任务 -->
+	<select id="overtimeTask" resultMap="takTaskMap">
+
+		select
+
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.progress_bar,
+		task.state,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag
+		from tak_task task
+
+		<where>
+			task.del_flag =0
+			and(task.pre_end_time is not null and  task.pre_end_time &lt; sysdate() and task.state !=3 and task.state !=4)
+
+		</where>
+		ORDER BY task.id  desc
+	</select>
+
+	<!-- 获取在线任务数 -->
+	<select id="getOnlineTask" resultMap="takTaskMap">
+		select
+		*
+		from tak_task task
+		where task.del_flag =0
+		and task.pre_end_time is not null
+		and task.pre_end_time <![CDATA[<= ]]> now()
+		and task.state = 1
+	</select>
+
+	<!-- 获取今日创建任务数 -->
+	<select id="getTodayCreateTask" resultType="java.lang.Integer">
+		select count(*) from tak_task where create_time between current_date() and date_format(current_date,'%Y-%m-%d 23:59:59');
+	</select>
+
+	<!-- 获取今日创建任务完成数 -->
+	<select id="getTodayCreateOverTask" resultType="java.lang.Integer">
+		select count(*) from tak_task where create_time between current_date() and date_format(current_date,'%Y-%m-%d 23:59:59') and state = 3
+	</select>
+
+	<resultMap id="takTaskMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.TaskVo">
+		<id property="id" column="id"/>
+		<result property="taskId" column="task_id"/>
+		<result property="sourceItems" column="source_items"/>
+		<result property="sourceItemsId" column="source_items_id"/>
+		<result property="taskName" column="task_name"/>
+		<result property="taskDescribe" column="task_describe"/>
+		<result property="patientId" column="patient_id"/>
+
+		<result property="dutyNurseId" column="duty_nurse_id"/>
+		<result property="preStartTime" column="pre_start_time"/>
+		<result property="preEndTime" column="pre_end_time"/>
+		<result property="creatorId" column="creator_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="emergency" column="emergency"/>
+		<result property="progressBar" column="progress_bar"/>
+		<result property="state" column="state"/>
+		<result property="receptionNurseId" column="reception_nurse_id"/>
+		<result property="completedNurseId" column="completed_nurse_id"/>
+		<result property="receiveTime" column="receive_time"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="result" column="result"/>
+		<result property="deptId" column="dept_id"/>
+
+		<result property="patientName" column="patname"/>
+		<result property="nurseCompletedName" column="nurname"/>
+	</resultMap>
+
+	<!-- 通过项目id查询对应的数据 （医嘱）  -->
+	<select id="getsSourceItemsId" parameterType="java.lang.String" resultMap="takTaskMap">
+		select
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe
+		from tak_task task
+		<where>
+			<if test="sourceItemsId !=null">
+				and task.source_items_id = #{sourceItemsId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据患者ID获取任务列表-状态为：1待执行  2 执行中，任务类型：1代表医嘱  -->
+	<select id="getAdviceTaskByPatientId" parameterType="java.lang.String" resultMap="takTaskMap">
+		select
+		*
+		from tak_task task
+		<where>
+			<if test="patientId != null">
+				and task.patient_id = #{patientId}
+			</if>
+			and (task.state = 1 or task.state = 2)
+			and task.source_items = 1
+		</where>
+	</select>
+
+	<select id="getTaskByTaskId" parameterType="java.lang.String" resultMap="takTaskMap">
+		select
+		task.id,
+		task.task_id,
+		task.source_items,
+		task.source_items_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.duty_nurse_id,
+		task.pre_start_time,
+		task.pre_end_time,
+		task.creator_id,
+		task.create_time,
+		task.emergency,
+		task.state,
+		task.progress_bar,
+		task.reception_nurse_id,
+		task.completed_nurse_id,
+		task.receive_time,
+		task.start_time,
+		task.end_time,
+		task.result,
+		task.dept_id,
+		task.del_flag
+		from tak_task task
+		left join pat_patient pat on task.patient_id = pat.patient_id
+		left join nur_nurse nur on  task.completed_nurse_id = nur.nurse_id
+		left join nur_nurse nurs on  task.reception_nurse_id = nurs.nurse_id
+		left join nur_nurse nurss on  task.creator_id = nurss.nurse_id
+		<where>
+			task.del_flag =0
+			<if test="taskId != null">
+				and  task.task_id = #{taskId}
+			</if>
+		</where>
+		ORDER BY task.id  desc
+	</select>
+
+	<resultMap id="takTaskMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.Task">
+		<id property="id" column="id"/>
+		<result property="taskId" column="task_id"/>
+		<result property="sourceItems" column="source_items"/>
+		<result property="sourceItemsId" column="source_items_id"/>
+		<result property="taskName" column="task_name"/>
+		<result property="taskDescribe" column="task_describe"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="dutyNurseId" column="duty_nurse_id"/>
+		<result property="preStartTime" column="pre_start_time"/>
+		<result property="preEndTime" column="pre_end_time"/>
+		<result property="creatorId" column="creator_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="emergency" column="emergency"/>
+		<result property="state" column="state"/>
+		<result property="progressBar" column="progress_bar"/>
+		<result property="completedNurseId" column="completed_nurse_id"/>
+		<result property="receptionNurseId" column="reception_nurse_id"/>
+		<result property="completedNurseId" column="completed_nurse_id"/>
+		<result property="receiveTime" column="receive_time"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="result" column="result"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

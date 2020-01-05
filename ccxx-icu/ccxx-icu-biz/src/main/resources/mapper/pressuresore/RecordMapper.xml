@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.pressuresore.RecordMapper">
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" resultMap="preSoreRecorderMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.pressuresore.Record">
+		select
+		rec.id,
+		rec.patient_id,
+		rec.patient_name,
+		rec.gender,
+		rec.age,
+		rec.pre_source,
+		rec.occurrence_time,
+		rec.hospitalnumber,
+		rec.assessment_results,
+		rec.by_stages,
+		rec.pre_position,
+		rec.skin_condition_picture,
+		rec.skin_condition,
+		rec.sore_range,
+		rec.skin_color,
+		rec.exudate,
+		rec.skin_situation,
+		rec.local_processing,
+		rec.dressing_paste_if_good,
+		rec.if_exudate,
+		rec.preventive_measures,
+		rec.nursing_measures,
+		rec.note_taker,
+		rec.note_time,
+		rec.del_flag,
+		nur.real_name as nurName
+		from pre_sore_record rec
+		left join nur_nurse nur on rec.note_taker =  nur.nurse_id
+		<where>
+			rec.del_flag = 0
+			<if test="recorder.patientId !=null">
+				and rec.patient_id = #{recorder.patientId}
+			</if>
+		</where>
+		order by rec.id desc
+	</select>
+
+	<!-- id 查询全部数据 连表查询-->
+	<select id="getByAll" resultMap="preSoreRecorderMapVo" parameterType="java.lang.Integer">
+		select
+		rec.id,
+		rec.patient_id,
+		rec.patient_name,
+		rec.gender,
+		rec.age,
+		rec.pre_source,
+		rec.occurrence_time,
+		rec.hospitalnumber,
+		rec.assessment_results,
+		rec.by_stages,
+		rec.pre_position,
+		rec.skin_condition_picture,
+		rec.skin_condition,
+		rec.sore_range,
+		rec.skin_color,
+		rec.exudate,
+		rec.skin_situation,
+		rec.local_processing,
+		rec.dressing_paste_if_good,
+		rec.if_exudate,
+		rec.preventive_measures,
+		rec.nursing_measures,
+		rec.note_taker,
+		rec.note_time,
+		rec.del_flag,
+		nur.real_name as nurName
+		from pre_sore_record rec
+		left join nur_nurse nur on rec.note_taker =  nur.nurse_id
+		<where>
+			rec.id = #{id}
+		</where>
+
+	</select>
+
+	<select id="getOneRecord"  resultMap="preSoreRecorderMapVo">
+
+		select
+		rec.id,
+		rec.patient_id,
+		rec.patient_name,
+		rec.gender,
+		rec.age,
+		rec.pre_source,
+		rec.occurrence_time,
+		rec.hospitalnumber,
+		rec.assessment_results,
+		rec.by_stages,
+		rec.pre_position,
+		rec.skin_condition_picture,
+		rec.skin_condition,
+		rec.sore_range,
+		rec.skin_color,
+		rec.exudate,
+		rec.skin_situation,
+		rec.local_processing,
+		rec.dressing_paste_if_good,
+		rec.if_exudate,
+		rec.preventive_measures,
+		rec.nursing_measures,
+		rec.note_taker,
+		rec.note_time,
+		rec.del_flag,
+		nur.real_name as nurName
+		from pre_sore_record rec
+		left join nur_nurse nur on rec.note_taker =  nur.nurse_id
+		where
+		rec.del_flag = 0
+		and
+		rec.patient_id = #{patientId}
+		order by id desc
+		limit 1
+
+	</select>
+
+	<resultMap id="preSoreRecorderMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.pressuresore.RecorderVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="gender" column="gender"/>
+		<result property="age" column="age"/>
+		<result property="hospitalnumber" column="hospitalnumber"/>
+		<result property="assessmentResults" column="assessment_results"/>
+		<result property="byStages" column="by_stages"/>
+		<result property="preSource" column="pre_source"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="prePosition" column="pre_position"/>
+		<result property="skinConditionPicture" column="skin_condition_picture"/>
+		<result property="skinCondition" column="skin_condition"/>
+		<result property="soreRange" column="sore_range"/>
+		<result property="skinColor" column="skin_color"/>
+		<result property="exudate" column="exudate"/>
+		<result property="skinSituation" column="skin_situation"/>
+		<result property="localProcessing" column="local_processing"/>
+		<result property="dressingPasteIfGood" column="dressing_paste_if_good"/>
+		<result property="ifExudate" column="if_exudate"/>
+		<result property="preventiveMeasures" column="preventive_measures"/>
+		<result property="nursingMeasures" column="nursing_measures"/>
+		<result property="noteTaker" column="note_taker"/>
+		<result property="noteTime" column="note_time"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="nurseName" column="nurName"/>
+	</resultMap>
+
+
+	<resultMap id="preSoreRecorderMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.pressuresore.RecorderVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="gender" column="gender"/>
+		<result property="age" column="age"/>
+		<result property="hospitalnumber" column="hospitalnumber"/>
+		<result property="assessmentResults" column="assessment_results"/>
+		<result property="byStages" column="by_stages"/>
+		<result property="preSource" column="pre_source"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="prePosition" column="pre_position"/>
+		<result property="skinConditionPicture" column="skin_condition_picture"/>
+		<result property="skinCondition" column="skin_condition"/>
+		<result property="soreRange" column="sore_range"/>
+		<result property="skinColor" column="skin_color"/>
+		<result property="exudate" column="exudate"/>
+		<result property="skinSituation" column="skin_situation"/>
+		<result property="localProcessing" column="local_processing"/>
+		<result property="dressingPasteIfGood" column="dressing_paste_if_good"/>
+		<result property="ifExudate" column="if_exudate"/>
+		<result property="preventiveMeasures" column="preventive_measures"/>
+		<result property="nursingMeasures" column="nursing_measures"/>
+		<result property="noteTaker" column="note_taker"/>
+		<result property="noteTime" column="note_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.ArrangeResultMapper">
+
+	<resultMap id="arrangeResultMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.ArrangeResult">
+		<id property="id" column="id"/>
+		<result property="arrangeResultId" column="arrange_result_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="dateTime" column="date_time"/>
+		<result property="workShift" column="work_shift"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+	</resultMap>
+
+	<sql id="Map_List_Vo">
+
+		ar.id,ar.arrange_result_id,ar.dept_id,ar.nurse_id,ar.start_time,ar.date_time,ar.work_shift,
+		ar.create_user_id,n.real_name as nurseName
+
+	</sql>
+
+	<sql id="Map_List">
+
+		id,arrange_result_id,dept_id,nurse_id,start_time,date_time,work_shift,create_user_id
+
+	</sql>
+	<!--根据护士 或科室 排班时间  当班时间查询结果-->
+	<select id="getByDate" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.ArrangeResult"
+			resultMap="arrangeResultMap">
+
+		SELECT
+		<include refid="Map_List"/>
+		FROM
+		nur_arrange_result
+		WHERE
+		del_flag = 0
+		<if test="startTime != null">
+			and date_format(start_time,'%Y-%m-%d')= date_format(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="dateTime != null">
+			and date_format(date_time,'%Y-%m-%d')= date_format(#{dateTime},'%Y-%m-%d')
+		</if>
+		<if test="nurseId != null">
+			and nurse_id = #{nurseId}
+		</if>
+		<if test="deptId != null">
+			and dept_id = #{deptId}
+		</if>
+		<if test=" workShift != null">
+			and work_shift = #{workShift}
+		</if>
+	</select>
+
+	<!--查询某护士最新的一次排班结果-->
+	<select id="selectNewWork" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.ArrangeResult"
+			parameterType="java.lang.String">
+		select
+		<include refid="Map_List"/>
+		from
+		nur_arrange_result
+		where
+		del_flag = 0
+		and
+		nurse_id = #{nurseId}
+		order by date_time desc limit 1
+
+	</select>
+
+
+	<!--查询某人某月的排班记录-->
+	<select id="getShiftData" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.ArrangeResultVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.ArrangeResultBo">
+
+		SELECT
+		<include refid="Map_List_Vo"/>
+		FROM
+		nur_arrange_result ar
+		left join nur_nurse n on ar.nurse_id = n.nurse_id
+		WHERE
+		ar.del_flag = 0
+		and n.del_flag = 0
+		<if test=" deptId != null">
+			and ar.dept_id = #{deptId}
+		</if>
+		<if test=" nurseId != null">
+			and ar.nurse_id = #{nurseId}
+		</if>
+		<if test=" workShift != null">
+			and ar.work_shift = #{workShift}
+		</if>
+		<if test=" nurseGrade != null">
+			and n.nurse_grade = #{nurseGrade}
+		</if>
+		<if test=" nurseName != null and nurseName != ''">
+			and n.real_name LIKE CONCAT('%',#{nurseName},'%')
+		</if>
+		<if test=" scope == 1 ">
+			and date_format(ar.date_time,'%Y-%m-%d')= date_format(#{dateTime},'%Y-%m-%d')
+		</if>
+		<if test=" scope == 2">
+			and date_format(ar.start_time,'%Y-%m-%d')= date_format(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test=" scope == 3">
+			and date_format(ar.date_time,'%Y-%m')= date_format(#{dateTime},'%Y-%m')
+		</if>
+		order by ar.date_time asc
+
+
+	</select>
+
+
+</mapper>

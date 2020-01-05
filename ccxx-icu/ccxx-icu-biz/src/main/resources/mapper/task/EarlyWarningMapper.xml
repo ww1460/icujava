@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.EarlyWarningMapper">
+
+
+
+	<!-- 定时查询是否有重复任务的数据-->
+	<select id="timingSelect" resultMap="takEarlyWarningMap" parameterType="java.lang.String">
+			select
+			 id,
+			task_id,
+			del_flag
+			from tak_early_warning
+			<where>
+				del_flag = 0
+				<if  test="taskId !=null">
+					and task_id = #{taskId}
+				</if>
+			</where>
+
+	</select>
+
+
+	<!-- 定时查询全部数据-->
+	<select id="timingAll" resultMap="takEarlyWarningMap">
+		select
+		id,
+		task_id,
+		trigger_time,
+		reason,
+		task_content,
+		patient_id,
+		nurse_id,
+		dept_id,
+		state,
+		del_flag
+		from tak_early_warning
+			where del_flag = 0
+	</select>
+
+
+
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" resultMap="takEarlyWarningMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.EarlyWarning">
+
+		select
+		war.id,
+		war.task_id,
+		war.trigger_time,
+		war.reason,
+		war.task_content,
+		war.patient_id,
+		war.nurse_id,
+		war.state,
+		war.del_flag,
+		war.dept_id,
+		nur.real_name as nurname,
+		pat.`name` as patname
+		from  tak_early_warning war
+		left join nur_nurse nur on war.nurse_id = nur.nurse_id
+		left join pat_patient pat on war.patient_id = pat.patient_id
+		left join nur_nurse_patient_correlation cor on war.patient_id = cor.patient_id
+		<where>
+			war.del_flag = 0
+			<if test="earlyWarning.deptId != null">
+				and war.dept_id = #{earlyWarning.deptId}
+			</if>
+			<if test="earlyWarning.patientId != null">
+				and war.patient_id = #{earlyWarning.patientId}
+			</if>
+			<if test="earlyWarning.nurseId != null">
+				and war.nurse_id = #{earlyWarning.nurseId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 实时展示预警数据 -->
+	<select id="scrollingData" resultMap="takEarlyWarningMap">
+		select
+		*
+		from tak_early_warning
+		where del_flag = 0
+		and state = 0
+	</select>
+
+	<select id="getTask" resultMap="takEarlyWarningMapVo">
+		select
+		war.id,
+		war.task_id,
+		war.trigger_time,
+		war.reason,
+		war.task_content,
+		war.patient_id,
+		war.nurse_id,
+		war.state,
+		war.del_flag,
+		war.dept_id,
+		nur.real_name as nurname,
+		pat.`name` as patname,
+		hb.bed_name
+		from  tak_early_warning war
+		left join nur_nurse nur on war.nurse_id = nur.nurse_id
+		left join pat_patient pat on war.patient_id = pat.patient_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = war.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		where
+			war.del_flag =0
+		and war.state = 0
+		<if test="deptId != null">
+			and war.dept_id = #{deptId}
+		</if>
+		<if test=" roleFlag = 0 and nurseId != null">
+			and war.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{nurseId}
+			)
+		</if>
+		order by war.trigger_time desc
+	</select>
+
+
+
+	<resultMap id="takEarlyWarningMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.EarlyWarningVo">
+		<id property="id" column="id"/>
+		<result property="taskId" column="task_id"/>
+		<result property="triggerTime" column="trigger_time"/>
+		<result property="taskContent" column="task_content"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="reason" column="reason"/>
+		<result property="state" column="state"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="patientName" column="nurname"/>
+		<result property="nurseName" column="patname"/>
+		<result property="bedName" column="bedName"/>
+	</resultMap>
+
+
+
+
+
+
+  <resultMap id="takEarlyWarningMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.EarlyWarning">
+                  <id property="id" column="id"/>
+                        <result property="taskId" column="task_id"/>
+                        <result property="triggerTime" column="trigger_time"/>
+                        <result property="taskContent" column="task_content"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="nurseId" column="nurse_id"/>
+                        <result property="deptId" column="dept_id"/>
+	  					<result property="reason" column="reason"/>
+                        <result property="state" column="state"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

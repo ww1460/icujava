@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.knowledgeBase.PersonalSummaryMapper">
+
+  <resultMap id="knowPersonalSummaryMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo">
+                  <id property="id" column="id"/>
+                        <result property="personalSummaryId" column="personal_summary_id"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="title" column="title"/>
+                        <result property="picture" column="picture"/>
+                        <result property="category" column="category"/>
+                        <result property="keyword" column="keyword"/>
+                        <result property="collectCount" column="collect_count"/>
+                        <result property="content" column="content"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="publishStatus" column="publish_status"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="updateUserId" column="update_user_id"/>
+                        <result property="nurseName" column="real_name" />
+                        <result property="collectStatus" column="collectStatus" />
+            </resultMap>
+      <select id="selectAll" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo"
+              parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo">
+            SELECT
+              summ.id,
+              summ.personal_summary_id,
+              summ.dept_id,
+              summ.title,
+	          summ.picture,
+              summ.category,
+              summ.keyword,
+              summ.collect_count,
+              summ.content,
+              summ.create_user_id,
+              summ.create_time,
+              summ.publish_status,
+              summ.del_flag,
+              summ.del_time,
+              summ.del_user_id,
+              summ.update_time,
+              summ.update_user_id,
+              nur.real_name,
+              col.id as collectStatus
+            FROM know_personal_summary summ
+              left join nur_nurse nur on nur.user_id = summ.create_user_id
+            left join know_nurse_collect col on summ.personal_summary_id = col.personal_summary_id
+            <where>
+                summ.del_flag = 0 and summ.publish_status = 1 and summ.dept_id = #{personalSummary.deptId}
+                <if test="personalSummary.title != null and personalSummary.title != ''">
+                    AND summ.title LIKE concat('%',#{personalSummary.title},'%')
+                </if>
+                <if test="personalSummary.category != null and personalSummary.category != ''">
+                    AND summ.category = #{personalSummary.category}
+                </if>
+                <if test="personalSummary.keyword != null and personalSummary.keyword != ''">
+                    AND summ.keyword LIKE concat('%',#{personalSummary.keyword},'%')
+                </if>
+
+            </where>
+          order by summ.id DESC
+      </select>
+    <select id="selectPersonal" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo"
+            parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo">
+        SELECT
+        summ.id,
+        summ.personal_summary_id,
+        summ.dept_id,
+        summ.title,
+        summ.picture,
+        summ.category,
+        summ.keyword,
+        summ.collect_count,
+        summ.content,
+        summ.create_user_id,
+        summ.create_time,
+        summ.publish_status,
+        summ.del_flag,
+        summ.del_time,
+        summ.del_user_id,
+        summ.update_time,
+        summ.update_user_id,
+        nur.real_name
+        FROM know_personal_summary summ
+        left join nur_nurse nur on nur.user_id = summ.create_user_id
+        <where>
+            summ.del_flag = 0 and summ.create_user_id = #{personalSummary.createUserId}
+            <if test="personalSummary.title != null and personalSummary.title != ''">
+                AND summ.title LIKE concat('%',#{personalSummary.title},'%')
+            </if>
+            <if test="personalSummary.category != null and personalSummary.category != ''">
+                AND summ.category = #{personalSummary.category}
+            </if>
+            <if test="personalSummary.keyword != null and personalSummary.keyword != ''">
+                AND summ.keyword LIKE concat('%',#{personalSummary.keyword},'%')
+            </if>
+
+
+        </where>
+        order by summ.publish_status,summ.id DESC
+    </select>
+
+    <select id="selectCollect" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo"
+            parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.knowledgeBase.PersonalSummaryVo">
+        SELECT
+        summ.id,
+        summ.personal_summary_id,
+        summ.dept_id,
+        summ.title,
+        summ.picture,
+        summ.category,
+        summ.keyword,
+        summ.collect_count,
+        summ.content,
+        summ.create_user_id,
+        summ.create_time,
+        summ.publish_status,
+        summ.del_flag,
+        summ.del_time,
+        summ.del_user_id,
+        summ.update_time,
+        summ.update_user_id,
+        nur.real_name,
+        col.id as collectStatus
+        FROM know_personal_summary summ
+        left join nur_nurse nur on nur.user_id = summ.create_user_id
+        left join know_nurse_collect col on summ.personal_summary_id = col.personal_summary_id
+        <where>
+            col.nurse_id = #{personalSummary.nurseId}
+            <if test="personalSummary.title != null and personalSummary.title != ''">
+                AND summ.title LIKE concat('%',#{personalSummary.title},'%')
+            </if>
+            <if test="personalSummary.category != null and personalSummary.category != ''">
+                AND summ.category = #{personalSummary.category}
+            </if>
+            <if test="personalSummary.keyword != null and personalSummary.keyword != ''">
+                AND summ.keyword LIKE concat('%',#{personalSummary.keyword},'%')
+            </if>
+        </where>
+        order by summ.id DESC
+    </select>
+</mapper>

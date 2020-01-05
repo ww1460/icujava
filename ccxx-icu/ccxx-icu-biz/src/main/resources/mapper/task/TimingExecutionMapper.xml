@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.TimingExecutionMapper">
+
+
+
+
+
+
+	<!-- 分页查询长期任务 -->
+	<select id="selectPaging" resultMap="takTimingExecutionMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.TimingExecution">
+		SELECT
+			tim.id,
+			tim.source_id,
+		    tim.source,
+			tim.task_name,
+			tim.task_describe,
+			tim.next_execution_time,
+			tim.interval_times,
+			tim.pre_start_time,
+			tim.pre_end_time,
+			tim.patient_id,
+			tim.dept_id,
+			tim.del_flag,
+			pat.`name` as patname,
+			nur.real_name as nurname
+			from tak_timing_execution tim
+			left join pat_patient pat on tim.patient_id = pat.patient_id
+			left join nur_nurse nur on tim.create_user_id= nur.nurse_id
+		  <where>
+			  tim.del_flag = 0
+			  <if test="timingExecution.deptId !=null and timingExecution.deptId !=''">
+				 and  tim.dept_id = #{timingExecution.deptId}
+			  </if>
+			  <if test="timingExecution.patientId !=null and timingExecution.patientId !=''">
+				  and  tim.patient_id = #{timingExecution.patientId}
+			  </if>
+		  </where>
+		  order by tim.create_time desc
+	</select>
+
+
+	<!-- 定时查询数据 -->
+	<select id="timingQuery" resultMap="takTimingExecutionMapVo">
+		SELECT
+		tim.id,
+		tim.source_id,
+		tim.source,
+		tim.task_name,
+		tim.task_describe,
+		tim.next_execution_time,
+		tim.interval_times,
+		tim.pre_start_time,
+		tim.pre_end_time,
+		tim.patient_id,
+		tim.dept_id,
+		tim.del_flag,
+		pat.`name` as patname,
+		nur.real_name as nurname
+		from tak_timing_execution tim
+		left join pat_patient pat on tim.patient_id = pat.patient_id
+		left join nur_nurse nur on tim.create_user_id= nur.nurse_id
+		WHERE tim.pre_start_time &lt; sysdate()  and  tim.pre_end_time &gt;= sysdate()  and tim.next_execution_time &lt; sysdate()
+		and tim.del_flag = 0
+
+	</select>
+
+
+
+	<!-- 通过患者id 查询相关的长期任务 -->
+	<select id="stopTimingExecution" parameterType="java.lang.String" resultMap="stopTimingExecutionMap">
+		select
+			id,
+		    source_id,
+		    source,
+			patient_id,
+			del_flag
+			from tak_timing_execution
+			<where>
+				del_flag =0
+				<if test="patientId !=null">
+					and patient_id =#{patientId}
+				</if>
+			</where>
+	</select>
+	<resultMap id="stopTimingExecutionMap" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.TimingExecutionVo">
+		<id property="id" column="id"/>
+		<result property="sourceId" column="source_id" />
+		<result property="source" column="source" />
+		<result property="patientId" column="patient_id"/>
+		<result property="delFlag" column="del_flag"/>
+	</resultMap>
+
+
+
+
+
+	<resultMap id="takTimingExecutionMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.TimingExecutionVo">
+		<id property="id" column="id"/>
+		<result property="sourceId" column="source_id" />
+		<result property="source" column="source" />
+		<result property="taskName" column="task_name"/>
+		<result property="taskDescribe" column="task_describe"/>
+		<result property="nextExecutionTime" column="next_execution_time"/>
+		<result property="intervalTimes" column="interval_times"/>
+		<result property="preStartTime" column="pre_start_time"/>
+		<result property="preEndTime" column="pre_end_time"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="patientName" column="patname"/>
+		<result property="nurseName" column="nurname"/>
+	</resultMap>
+
+
+
+
+
+  <resultMap id="takTimingExecutionMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.TimingExecution">
+                  <id property="id" column="id"/>
+						  <result property="sourceId" column="source_id" />
+						  <result property="source" column="source" />
+						  <result property="taskName" column="task_name"/>
+						  <result property="taskDescribe" column="task_describe"/>
+                        <result property="nextExecutionTime" column="next_execution_time"/>
+                        <result property="intervalTimes" column="interval_times"/>
+                        <result property="preStartTime" column="pre_start_time"/>
+                        <result property="preEndTime" column="pre_end_time"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+            </resultMap>
+</mapper>

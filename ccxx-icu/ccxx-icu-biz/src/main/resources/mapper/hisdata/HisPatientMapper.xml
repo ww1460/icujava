@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.hisdata.HisPatientMapper">
+
+
+	<!-- his 分页查询数据 -->
+	<select id="selectPaging" resultMap="hisPatientMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisPatient">
+		SELECT * from his_patient WHERE  del_flag = 0 and entry_state != 2 and entry_state != 3
+		<if  test="hisPatient.admissionDept != null" >
+			and admission_dept=#{hisPatient.admissionDept}
+		</if>
+		order by entry_state desc
+	</select>
+
+
+
+	<!-- 接收 his 传来的数据新增 -->
+	<select id="add" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisPatient" resultType="java.lang.Integer">
+		insert into
+		his_patient
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		<if test="hisPatientId !=null">
+			his_patient_id,
+		</if>
+		<if test="name !=null">
+			name,
+		</if>
+		<if test="gender !=null">
+			gender,
+		</if>
+		<if test="birthday !=null">
+			birthday,
+		</if>
+		<if test="blood !=null">
+			blood,
+		</if>
+		<if test="nationality !=null">
+			nationality,
+		</if>
+		<if test="nation !=null">
+			nation,
+		</if>
+		<if test="idType !=null">
+			id_type,
+		</if>
+		<if test="idNumber !=null">
+			id_number,
+		</if>
+		<if test="phone !=null">
+			phone,
+		</if>
+		<if test="marriage !=null">
+			marriage,
+		</if>
+		<if test="career !=null">
+			career,
+		</if>
+		<if test="age !=null">
+			age,
+		</if>
+		<if test="monthAge !=null">
+			month_age,
+		</if>
+		<if test="birthWeight !=null">
+			birth_weight,
+		</if>
+		<if test="admissionWeight !=null">
+			admission_weight,
+		</if>
+		<if test="medicalRecords !=null">
+			medical_records,
+		</if>
+		<if test="outpatient !=null">
+			outpatient,
+		</if>
+		<if test="hospitalnumber !=null">
+			hospitalnumber,
+		</if>
+		<if test="ohip !=null">
+			ohip,
+		</if>
+		<if test="seedoctor !=null">
+			seedoctor,
+		</if>
+		<if test="currentAddressProvince !=null">
+			current_address_province,
+		</if>
+		<if test="currentAddressCity !=null">
+			current_address_city,
+		</if>
+		<if test="currentAddressCounty !=null">
+			current_address_county,
+		</if>
+		<if test="currentAddressDetails !=null">
+			current_address_details,
+		</if>
+		<if test="otherContacts !=null">
+			other_contacts,
+		</if>
+		<if test="relation !=null">
+			relation,
+		</if>
+		<if test="contactAddress !=null">
+			contact_address,
+		</if>
+		<if test="contactPhone !=null">
+			contact_phone,
+		</if>
+		<if test="admissionPath !=null">
+			admission_path,
+		</if>
+		<if test="transferDepartments !=null">
+			transfer_departments,
+		</if>
+		<if test="admissionDept !=null">
+			admission_dept,
+		</if>
+
+			<if test="admissionTime !=null">
+				admission_time,
+			</if>
+
+			<if test="dischargeDept !=null">
+				discharge_dept,
+			</if>
+			<if test="dischargeTime !=null">
+				discharge_time,
+			</if>
+			<if test="timeOfAdmission !=null">
+			time_of_admission,
+		</if>
+		<if test="frequency !=null">
+			frequency,
+		</if>
+		<if test="allergichi !=null">
+			allergichi,
+		</if>
+
+		<if test="diagnosis !=null">
+			diagnosis,
+		</if>
+		<if test="fadviceUserName !=null">
+			fadvice_user_name,
+		</if>
+		<if test="fadviceTime !=null">
+			fadvice_time,
+		</if>
+			<if test="deptId !=null">
+				dept_id,
+			</if>
+			<if test="deptNumber !=null">
+				dept_number,
+			</if>
+			<if test="sourceDeptId !=null">
+				source_dept_id,
+			</if>
+			<if test="sourceDeptNumber !=null">
+				source_dept_number
+			</if>
+		</trim>
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		<if test="hisPatientId !=null">
+			#{hisPatientId},
+		</if>
+		<if test="name !=null">
+			#{name},
+		</if>
+		<if test="gender !=null">
+			#{gender},
+		</if>
+		<if test="birthday !=null">
+			#{birthday},
+		</if>
+		<if test="blood !=null">
+			#{blood},
+		</if>
+		<if test="nationality !=null">
+			#{nationality},
+		</if>
+		<if test="nation !=null">
+			#{nation},
+		</if>
+		<if test="idType !=null">
+			#{idType},
+		</if>
+		<if test="idNumber !=null">
+			#{idNumber},
+		</if>
+		<if test="phone !=null">
+			{phone},
+		</if>
+		<if test="marriage !=null">
+			#{marriage},
+		</if>
+		<if test="career !=null">
+			#{career},
+		</if>
+		<if test="age !=null">
+			#{age},
+		</if>
+		<if test="monthAge !=null">
+			#{monthAge},
+		</if>
+		<if test="birthWeight !=null">
+			#{birthWeight},
+		</if>
+		<if test="admissionWeight !=null">
+			#{admissionWeight},
+		</if>
+		<if test="medicalRecords !=null">
+			#{medicalRecords},
+		</if>
+		<if test="outpatient !=null">
+			#{outpatient},
+		</if>
+		<if test="hospitalnumber !=null">
+			#{hospitalnumber},
+		</if>
+		<if test="ohip !=null">
+			#{ohip},
+		</if>
+		<if test="seedoctor !=null">
+			#{seedoctor},
+		</if>
+		<if test="currentAddressProvince !=null">
+			{currentAddressProvince},
+		</if>
+		<if test="currentAddressCity !=null">
+			#{currentAddressCity},
+		</if>
+		<if test="currentAddressCounty !=null">
+			#{currentAddressCounty},
+		</if>
+		<if test="currentAddressDetails !=null">
+			#{currentAddressDetails},
+		</if>
+		<if test="otherContacts !=null">
+			#{otherContacts},
+		</if>
+		<if test="relation !=null">
+			#{relation},
+		</if>
+		<if test="contactAddress !=null">
+			#{contactAddress},
+		</if>
+		<if test="contactPhone !=null">
+			{contactPhone},
+		</if>
+		<if test="admissionPath !=null">
+			#{admissionPath},
+		</if>
+		<if test="transferDepartments !=null">
+			#{transferDepartments},
+		</if>
+		<if test="admissionDept !=null">
+			#{admissionDept},
+		</if>
+			<if test="admissionTime !=null">
+				admission_time,
+			</if>
+			<if test="dischargeDept !=null">
+				#{dischargeDept},
+			</if>
+			<if test="dischargeTime !=null">
+				#{dischargeTime},
+			</if>
+		<if test="timeOfAdmission !=null">
+			#{timeOfAdmission},
+		</if>
+		<if test="frequency !=null">
+			#{frequency},
+		</if>
+		<if test="allergichi !=null">
+			#{allergichi},
+		</if>
+
+		<if test="diagnosis !=null">
+			#{diagnosis},
+		</if>
+		<if test="fadviceUserName !=null">
+			 #{fadviceUserName},
+		</if>
+		<if test="fadviceTime !=null">
+				#{fadviceTime},
+		</if>
+		<if test="deptId !=null">
+			#{deptId},
+		</if>
+			<if test="deptNumber !=null">
+				#{deptNumber},
+			</if>
+
+			<if test="sourceDeptId !=null">
+				#{sourceDeptId},
+			</if>
+			<if test="sourceDeptNumber !=null">
+				#{sourceDeptNumber}
+			</if>
+		</trim>
+	</select>
+
+
+  <resultMap id="hisPatientMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.hisdata.HisPatient">
+                  <id property="id" column="id"/>
+	 					 <result property="patientId" column="patient_id"/>
+                        <result property="hisPatientId" column="his_patient_id"/>
+                        <result property="name" column="name"/>
+                        <result property="gender" column="gender"/>
+                        <result property="birthday" column="birthday"/>
+                        <result property="blood" column="blood"/>
+                        <result property="nationality" column="nationality"/>
+                        <result property="nation" column="nation"/>
+                        <result property="idType" column="id_type"/>
+                        <result property="idNumber" column="id_number"/>
+                        <result property="phone" column="phone"/>
+                        <result property="marriage" column="marriage"/>
+                        <result property="career" column="career"/>
+                        <result property="age" column="age"/>
+                        <result property="monthAge" column="month_age"/>
+                        <result property="birthWeight" column="birth_weight"/>
+                        <result property="admissionWeight" column="admission_weight"/>
+                        <result property="medicalRecords" column="medical_records"/>
+                        <result property="outpatient" column="outpatient"/>
+                        <result property="hospitalnumber" column="hospitalnumber"/>
+                        <result property="ohip" column="ohip"/>
+                        <result property="seedoctor" column="seedoctor"/>
+                        <result property="currentAddressProvince" column="current_address_province"/>
+                        <result property="currentAddressCity" column="current_address_city"/>
+                        <result property="currentAddressCounty" column="current_address_county"/>
+                        <result property="currentAddressDetails" column="current_address_details"/>
+                        <result property="otherContacts" column="other_contacts"/>
+                        <result property="relation" column="relation"/>
+                        <result property="contactAddress" column="contact_address"/>
+                        <result property="contactPhone" column="contact_phone"/>
+                        <result property="admissionPath" column="admission_path"/>
+                        <result property="transferDepartments" column="transfer_departments"/>
+						<result property="admissionDept" column="admission_dept"/>
+						 <result property="admissionTime" column="admission_time"/>
+						<result property="dischargeDept" column="discharge_dept"/>
+						<result property="dischargeTime" column="discharge_time"/>
+	  					<result property="turndepartmentDescribe" column="turndepartment_describe"/>
+	  					<result property="dischargeType" column="discharge_type"/>
+                        <result property="timeOfAdmission" column="time_of_admission"/>
+                        <result property="frequency" column="frequency"/>
+                        <result property="allergichi" column="allergichi"/>
+                        <result property="diagnosis" column="diagnosis"/>
+                        <result property="fadviceUserName" column="fadvice_user_name"/>
+                        <result property="fadviceTime" column="fadvice_time"/>
+	  					<result property="deptId" column="dept_id"/>
+						<result property="deptNumber" column="dept_number"/>
+						<result property="sourceDeptId" column="source_dept_id"/>
+	    				<result property="sourceDeptNumber" column="source_dept_number"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateUserId" column="update_user_id"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="entryState" column="entry_state"/>
+            </resultMap>
+</mapper>

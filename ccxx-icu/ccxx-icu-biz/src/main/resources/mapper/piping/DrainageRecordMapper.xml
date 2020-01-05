@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.piping.DrainageRecordMapper">
+
+
+
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" resultMap="pipDrainageRecordMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.DrainageRecord">
+		select
+		rec.id,
+		rec.drainage_records_id,
+		rec.piping_id,
+		rec.drainage_id,
+		rec.patient_id,
+		rec.drainage_attribute_id,
+		rec.`value`,
+		rec.measures,
+		rec.normal,
+		rec.nurse_id,
+		rec.del_flag,
+		rec.dept_id,
+		rec.create_time,
+		pip.piping_name as pipname,
+		dra.drainage_name as draname,
+		pat.`name` as patname,
+		nur.real_name as nurname
+		from pip_drainage_record rec
+		left join pip_piping pip on rec.piping_id = pip.piping_id
+		left join pip_drainage dra on rec.drainage_id = dra.drainage_id
+		left join pat_patient pat on  rec.patient_id  = pat.patient_id
+		left join nur_nurse nur on  rec.nurse_id = nur.nurse_id
+		<where>
+			rec.del_flag = 0
+			<if test="drainageRecord.deptId !=null">
+				and rec.dept_id = #{drainageRecord.deptId}
+			</if>
+			<if test="drainageRecord.patientId !=null">
+				and rec.patient_id = #{drainageRecord.patientId}
+			</if>
+			<if test="drainageRecord.normal !=null">
+				and rec.normal = #{drainageRecord.normal}
+			</if>
+			<if test="drainageRecord.nurseId !=null">
+				and rec.nurse_id = #{drainageRecord.nurseId}
+			</if>
+		</where>
+		order by rec.id desc
+	</select>
+
+	<resultMap id="pipDrainageRecordMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.piping.DrainageRecordVo">
+		<id property="id" column="id"/>
+		<result property="drainageRecordsId" column="drainage_records_id"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="drainageId" column="drainage_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="drainageAttributeId" column="drainage_attribute_id"/>
+		<result property="value" column="value"/>
+		<result property="measures" column="measures"/>
+		<result property="normal" column="normal"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="pipingName" column="pipname"/>
+		<result property="drainageName" column="draname"/>
+		<result property="patientName" column="patname"/>
+		<result property="nurseName" column="nurname"/>
+
+	</resultMap>
+
+
+
+	<resultMap id="pipDrainageRecordsMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.DrainageRecord">
+		<id property="id" column="id"/>
+		<result property="drainageRecordsId" column="drainage_records_id"/>
+		<result property="pipingId" column="piping_id"/>
+		<result property="drainageId" column="drainage_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="drainageAttributeId" column="drainage_attribute_id"/>
+		<result property="value" column="value"/>
+		<result property="measures" column="measures"/>
+		<result property="normal" column="normal"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+</mapper>

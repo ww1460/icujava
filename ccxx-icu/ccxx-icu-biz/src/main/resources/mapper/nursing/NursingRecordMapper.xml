@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nursing.NursingRecordMapper">
+
+	<resultMap id="NursingRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.NursingRecord">
+		<id property="id" column="id"/>
+		<result property="nursingRecordId" column="nursing_record_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="recordContent" column="record_content"/>
+		<result property="source" column="source"/>
+		<result property="sourceId" column="source_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="showFlag" column="show_flag"/>
+		<result property="remarks" column="remarks"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingRecordBo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.NursingRecordVo">
+
+		SELECT
+		nr.id,
+		nr.nursing_record_id,
+		nr.record_content,
+		nr.patient_id,
+		nr.create_user_id,
+		nr.dept_id,
+		nr.create_time,
+		nr.source,
+		nr.remarks,
+		nr.show_flag,
+		pp.`name` AS patientName,
+		hb.bed_code,
+		n.real_name
+		FROM
+		nur_nursing_record nr
+		LEFT JOIN pat_patient pp ON pp.patient_id = nr.patient_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = nr.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = nr.create_user_id
+		WHERE
+		nr.del_flag = 0
+		/*查询护士关联的患者 当患者为null时 */
+		<if test="query.deptId != null">
+			and nr.dept_id = #{query.deptId}
+		</if>
+		<if test="(query.patientId == null or query.patientId =='') and query.nurseId != null and query.nurseId != ''">
+			and nr.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.nurseId}
+			)
+		</if>
+		<if test=" query.patientId != null and query.patientId != '' ">
+			and nr.patient_id = #{query.patientId}
+		</if>
+		<if test="query.createUserId != null ">
+			and nr.create_user_id = #{query.createUserId}
+		</if>
+		<if test="query.source != null">
+			and nr.source = #{query.source}
+		</if>
+		<if test="query.createTime != null ">
+
+			and date_format(nr.create_time,'%Y-%m-%d')= date_format(#{query.createTime},'%Y-%m-%d')
+
+		</if>
+		order by nr.create_time desc
+	</select>
+
+	<select id="getReport" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.NursingReportThreeVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		SELECT
+			date_format(nr.create_time, '%m-%d') AS timeOfYear,
+			date_format(nr.create_time, '%H:%i') AS timeOfMin,
+			nn.real_name AS nurseName,
+			nn.signature,
+			nr.id,
+			nr.nursing_record_id,
+			nr.record_content,
+			nr.patient_id,
+			nr.source,
+			nr.source_id,
+			nr.dept_id,
+			nr.remarks,
+			nr.del_flag,
+			nr.create_user_id,
+			nr.create_time,
+			nr.update_time,
+			nr.del_time,
+			nr.del_user_id
+		FROM
+			nur_nursing_record nr
+		LEFT JOIN nur_nurse nn ON nn.user_id = nr.create_user_id
+		WHERE
+			nr.del_flag = 0
+		AND nr.patient_id = #{patientId}
+		and nr.show_flag = 1
+		AND date_format(
+			nr.create_time,
+			'%Y-%m-%d %H'
+		) >= date_format(
+			#{startTime},
+			'%Y-%m-%d %H'
+		)
+		AND date_format(
+			#{endTime},
+			'%Y-%m-%d %H'
+		) >= date_format(
+			nr.create_time,
+			'%Y-%m-%d %H'
+		)
+		ORDER BY nr.create_time
+	</select>
+
+
+	<!-- 获取在线护理记录数 -->
+	<select id="getOnlineNursingRecordNumber" resultMap="NursingRecordMap">
+		select
+		*
+		from nur_nursing_record record
+		where record.del_flag =0
+		and record.create_time is not null
+		and record.create_time <![CDATA[<= ]]> date_add(now(), interval 1 day)
+		and record.create_time <![CDATA[>= ]]> now()
+	</select>
+
+
+</mapper>

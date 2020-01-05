@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nursing.NursingTemplateMapper">
+
+	<resultMap id="NursingTemplateMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nursing.NursingTemplate">
+		<id property="id" column="id"/>
+		<result property="nursingTemplateId" column="nursing_template_id"/>
+		<result property="templateTitle" column="template_title"/>
+		<result property="templateCode" column="template_code"/>
+		<result property="templateDescription" column="template_description"/>
+		<result property="isProjectFlag" column="is_project_flag"/>
+		<result property="templateContent" column="template_content"/>
+		<result property="projectId" column="project_id"/>
+		<result property="projectDescribe" column="project_describe"/>
+		<result property="templateIndex" column="template_index"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="templateUseScope" column="template_use_scope"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+	</resultMap>
+	<!--查询本科室的护理模板  可根据条件选择查询的方向-->
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingTemplateBo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.NursingTemplateVo">
+
+		SELECT
+		distinct nt.template_code,
+		nt.template_title,
+		nt.template_description,
+		nt.is_project_flag,
+		nt.dept_id,
+		nt.template_content,
+		nt.template_use_scope,
+		nt.create_user_id,
+		n.real_name as creator
+		FROM
+		nur_nursing_template nt
+		LEFT JOIN nur_nurse n ON n.nurse_id = nt.create_user_id
+		WHERE
+		nt.del_flag = 0
+		<if test="query.deptId != null">
+			and nt.dept_id = #{query.deptId}
+		</if>
+		<if test="query.templateTitle != null and query.templateTitle != ''">
+			AND nt.template_title like CONCAT('%',#{query.templateTitle},'%')
+		</if>
+		<if test="query.templateCode != null and query.templateCode != ''">
+			AND nt.template_code = #{query.templateCode}
+		</if>
+		<if test="query.templateType != null and query.templateType != ''">
+			AND nt.template_type != #{query.templateType}
+		</if>
+		<if test="query.templateUseScope != null ">
+			and nt.template_use_scope = #{query.templateUseScope }
+		</if>
+		<if test="query.nurseId != null  and query.personal == 0">
+			and nt.create_user_id = #{query.nurseId}
+		</if>
+		<if test="query.nurseId != null  and query.personal == 1">
+			and nt.create_user_id != #{query.nurseId}
+		</if>
+		<choose>
+		<when test="query.nurseId != null">
+			order by ${query.orderBy}
+
+		</when>
+		<when test="query.nurseId == null">
+		order by nt.create_time desc
+		</when>
+		</choose>
+	</select>
+
+	<select id="selectByCode" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.NursingShowVo"
+			parameterType="java.lang.String">
+
+		SELECT
+			nt.template_title,
+			nt.template_description,
+			nt.template_code,
+			nt.template_use_scope,
+			nt.is_project_flag,
+			nt.template_type,
+			nt.template_content,
+			nt.template_index,
+			nt.project_id,
+			nt.dept_id,
+			pl.project_name,
+			pl.project_warm_flag,
+			nt.project_describe
+		FROM
+			nur_nursing_template nt
+		LEFT JOIN nur_project pl ON pl.project_id = nt.project_id AND pl.del_flag = 0
+		WHERE
+			nt.del_flag = 0
+		AND nt.template_code = #{templateCode}
+		ORDER BY
+			nt.template_index desc
+
+	</select>
+
+	<select id="useTemplate" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.NursingTemplateUseVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.UseNursingTemplateBo">
+
+		SELECT
+		nt.template_title,
+		nt.template_description,
+		nt.template_code,
+		nt.is_project_flag,
+		nt.template_content,
+		nt.template_use_scope,
+		nt.template_index
+		<if test="isProjectFlag == 0">
+			,nt.project_id,
+			pl.project_name,
+			pl.project_warm_flag,
+			pl.project_record_value_flag,
+			nt.project_describe,
+			ress.project_specific_record
+			FROM
+			nur_nursing_template nt
+			LEFT JOIN nur_project pl ON pl.project_id = nt.project_id
+			LEFT JOIN (
+			SELECT
+			pp.project_id,
+			pp.project_specific_record
+			FROM
+			nur_project_record pp,
+			(
+			SELECT
+			MAX(pr.id) id
+			FROM
+			nur_project_record pr
+			WHERE
+			pr.patient_id = #{patientId}
+			GROUP BY
+			pr.project_id
+			) res
+			WHERE
+			pp.id = res.id
+			) ress ON ress.project_id = nt.project_id
+			WHERE
+			nt.del_flag = 0
+			AND pl.del_flag = 0
+			AND nt.template_code = #{templateCode}
+		</if>
+		<if test="isProjectFlag == 1">
+			FROM
+			nur_nursing_template nt
+			WHERE
+			nt.del_flag = 0
+			AND nt.template_code = #{templateCode}
+		</if>
+	</select>
+
+
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.arrange.ArrangePeriodMapper">
+
+	<resultMap id="ArrangePeriodMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.arrange.ArrangePeriod">
+		<id property="id" column="id"/>
+		<result property="arrangePeriodId" column="arrange_period_id"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="monday" column="monday"/>
+		<result property="tuesday" column="tuesday"/>
+		<result property="wednesday" column="wednesday"/>
+		<result property="thursday" column="thursday"/>
+		<result property="friday" column="friday"/>
+		<result property="saturday" column="saturday"/>
+		<result property="sunday" column="sunday"/>
+		<result property="lastTimeNum" column="last_time_num"/>
+		<result property="thisTimeNum" column="this_time_num"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="createTime" column="create_time"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+	</resultMap>
+
+	<select id="selectWeekShift" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.arrange.WeekShiftVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.arrange.ArrangePeriod">
+
+			SELECT
+				n.real_name,
+				ap.id,
+				ap.arrange_period_id,
+				ap.nurse_id,
+				ap.dept_id,
+				ap.monday,
+				ap.saturday,
+				ap.thursday,
+				ap.tuesday,
+				ap.friday,
+				ap.sunday,
+				ap.wednesday,
+				ap.last_time_num,
+				ap.this_time_num,
+				ap.start_time,
+				ap.end_time,
+				ap.create_time
+			FROM
+				nur_nurse n
+			LEFT JOIN nur_arrange_period ap ON ap.nurse_id = n.nurse_id
+			AND DATE_FORMAT(ap.start_time, 'yyyy-MM-dd') >= DATE_FORMAT(
+				#{startTime},
+				'yyyy-MM-dd'
+			)
+			AND DATE_FORMAT(
+				#{startTime},
+				'yyyy-MM-dd'
+			) >= DATE_FORMAT(ap.end_time, 'yyyy-MM-dd')
+			AND ap.del_flag = 0
+			LEFT JOIN nur_nurse_extend ne ON ne.nurse_id = n.nurse_id
+			WHERE
+				n.del_flag = 0
+			<if test="deptId !=null">
+				and n.dept_id =#{deptId}
+			</if>
+			order by n.nurse_id desc
+	</select>
+
+
+</mapper>

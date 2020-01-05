@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.project.ProjectWarmMapper">
+
+	<resultMap id="ProjectWarmMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectWarm">
+		<id property="id" column="id"/>
+		<result property="projectWarmId" column="project_warm_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="warmValue" column="warm_value"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="warmContent" column="warm_content"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+
+	<sql id="Map_List">
+
+		id,project_warm_id,project_id,warm_value,patient_id,warm_content,dept_id,create_time,update_user_id,
+		create_user_id,del_flag,del_user_id,del_time,update_time
+
+	</sql>
+
+
+
+
+	<!--分页查询-->
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectWarmVo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectWarmVo">
+
+		SELECT
+			pw.id,
+			pw.project_id,
+			pw.patient_id,
+			pw.warm_content,
+			pw.warm_value,
+			pw.create_time,
+			pw.update_time,
+			p.`name` AS patientName,
+			hb.bed_code,
+			hb.bed_id,
+			pl.project_name,
+			pl.project_code
+		FROM
+			nur_project_warm pw
+		LEFT JOIN pat_patient p ON pw.patient_id = p.patient_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = pw.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		LEFT JOIN nur_project pl ON pl.project_id = pw.project_id
+		WHERE
+			pw.del_flag = 0
+
+		AND pl.project_warm_flag = 0
+		and p.entry_state = 2
+		<if test="query.deptId != null">
+			and pw.dept_id = #{query.deptId}
+		</if>
+		<if test="query.projectName != null and query.projectName != ''">
+			and pl.project_name like CONCAT('%',#{query.projectName},'%')
+		</if>
+		<if test="(query.patientId == null or query.patientId =='') and query.nurseId != null and query.nurseId != ''">
+			and pw.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.nurseId}
+			)
+		</if>
+		<if test="query.patientId != null and query.patientId != ''">
+			and pw.patient_id = #{query.patientId}
+		</if>
+
+		ORDER BY pw.create_time DESC
+
+	</select>
+
+
+	<!--获取数据最新的一条-->
+	<select id="selectByPatient" resultMap="ProjectWarmMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectWarm">
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_project_warm
+		where
+		del_flag = 0
+
+		<if test="patientId != null">
+			and patient_id = #{patientId}
+		</if>
+		<if test="projectId != null">
+			and project_id = #{projectId}
+		</if>
+		order by create_time DESC limit 1
+
+	</select>
+
+
+	<select id="warmShow" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectWarmVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectWarmVo">
+		SELECT
+		pw.id,
+		pw.project_id,
+		pw.patient_id,
+		pw.warm_content,
+		pw.warm_value,
+		pw.create_time,
+		pw.update_time,
+		p.`name` AS patientName,
+		hb.bed_code,
+		hb.bed_id,
+		pl.project_name,
+		pl.project_code
+		FROM
+		nur_project_warm pw
+		LEFT JOIN pat_patient p ON pw.patient_id = p.patient_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = pw.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		LEFT JOIN nur_project pl ON pl.project_id = pw.project_id
+		WHERE
+		pw.del_flag = 0
+
+		AND pl.project_warm_flag = 0
+		<if test="deptId != null">
+			and pw.dept_id = #{deptId}
+		</if>
+		<if test="(patientId == null or patientId =='') and nurseId != null and nurseId != ''">
+			and pw.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{nurseId}
+			)
+		</if>
+		<if test="startTime != null">
+			and pw.create_time >= #{startTime}
+		</if>
+		<if test="endTime != null">
+			and #{endTime} >= pw.create_time
+		</if>
+		ORDER BY pw.create_time DESC
+
+	</select>
+
+
+	<select id="toWatch" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectWarmVo"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectWarmVo">
+		SELECT
+		pw.id,
+		pw.project_id,
+		pw.patient_id,
+		pw.warm_content,
+		pw.warm_value,
+		pw.create_time,
+		pw.update_time,
+		p.`name` AS patientName,
+		hb.bed_code,
+		hb.bed_id,
+		pl.project_name,
+		pl.project_code
+		FROM
+		nur_project_warm pw
+		LEFT JOIN pat_patient p ON pw.patient_id = p.patient_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = pw.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		LEFT JOIN nur_project pl ON pl.project_id = pw.project_id
+		WHERE
+		pw.del_flag = 0
+		AND pl.project_warm_flag = 0
+		<if test="deptId != null">
+			and pw.dept_id = #{deptId}
+		</if>
+		<if test=" roleFlag = 0 and nurseId != null">
+			and pw.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{nurseId}
+			)
+		</if>
+		ORDER BY pw.create_time DESC
+
+	</select>
+
+
+
+</mapper>

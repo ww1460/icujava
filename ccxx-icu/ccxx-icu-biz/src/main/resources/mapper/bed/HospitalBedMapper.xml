@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.bed.HospitalBedMapper">
+
+	<resultMap id="hospitalBedMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.bed.HospitalBed">
+		<id property="id" column="id"/>
+		<result property="bedId" column="bed_id"/>
+		<result property="bedName" column="bed_name"/>
+		<result property="bedCode" column="bed_code"/>
+		<result property="rfid" column="rfid"/>
+		<result property="useFlag" column="use_flag"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+
+	<sql id="List_map">
+
+		id,bed_id,bed_name,bed_code,rfid,use_flag,dept_id,del_time,del_user_id,update_time,update_user_id,create_user_id
+		,create_time
+
+	</sql>
+
+
+	<select id="selectByFlag" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.bed.HospitalBed" resultMap="hospitalBedMap">
+
+		select
+		<include refid="List_map"/>
+		from
+		nur_hospital_bed
+		where
+		del_flag = 0
+		and
+		dept_id = #{deptId}
+		<if test="useFlag != null">
+			and use_flag =#{useFlag}
+		</if>
+		<if test="bedId != null">
+			and bed_id =#{bedId}
+		</if>
+
+	</select>
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.bed.HospitalBed" resultMap="hospitalBedMap">
+
+		select
+		<include refid="List_map"/>
+		from
+		nur_hospital_bed
+		where
+		del_flag = 0
+		<if test="query.bedId != null">
+			and bed_id = #{query.bedId}
+		</if>
+		<if test="query.deptId != null">
+			and dept_id = #{query.deptId}
+		</if>
+		<if test="query.bedCode != null and query.bedCode != ''">
+			and bed_code LIKE CONCAT('%',#{query.bedCode},'%')
+		</if>
+		<if test="query.bedName != null and query.bedName != ''">
+			and bed_name LIKE CONCAT('%',#{query.bedName},'%')
+		</if>
+		<if test="query.useFlag != null">
+			and use_flag =#{query.useFlag}
+		</if>
+		order by create_time desc
+
+	</select>
+
+	<!-- 统计所有病床数 -->
+	<select id="selectAllBedNumber" resultType="java.lang.Integer">
+		select count(*) from nur_hospital_bed
+	</select>
+
+
+</mapper>

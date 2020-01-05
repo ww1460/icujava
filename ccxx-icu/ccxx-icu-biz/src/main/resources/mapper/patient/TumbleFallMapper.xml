@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.TumbleFallMapper">
+
+	<resultMap id="TumbleFallMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.TumbleFall">
+		<id property="id" column="id"/>
+		<result property="tumbleFallId" column="tumble_fall_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="bedCode" column="bed_code"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="patientAge" column="patient_age"/>
+		<result property="admissionNumber" column="admission_number"/>
+		<result property="patientDiagnose" column="patient_diagnose"/>
+		<result property="deptName" column="dept_name"/>
+		<result property="mainMinder" column="main_minder"/>
+		<result property="occurrenceAddress" column="occurrence_address"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="fallPatientReason" column="fall_patient_reason"/>
+		<result property="fallPatientReasonRemarks" column="fall_patient_reason_remarks"/>
+		<result property="fallMedicalReason" column="fall_medical_reason"/>
+		<result property="fallEnvironmentReason" column="fall_environment_reason"/>
+		<result property="fallOtherReason" column="fall_other_reason"/>
+		<result property="fallOtherReasonRemarks" column="fall_other_reason_remarks"/>
+		<result property="fallCauseTrauma" column="fall_cause_trauma"/>
+		<result property="fallCauseTraumaLevel" column="fall_cause_trauma_level"/>
+		<result property="totalFallNum" column="total_fall_num"/>
+		<result property="handlingInformation" column="handling_information"/>
+		<result property="nurseName" column="nurse_name"/>
+		<result property="discussionTime" column="discussion_time"/>
+		<result property="questionMaster" column="question_master"/>
+		<result property="discussionRecord" column="discussion_record"/>
+		<result property="participantName" column="participant_name"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+	<sql id="Map_List">
+		tf.id,tf.tumble_fall_id,tf.patient_id,tf.bed_code,tf.patient_name,tf.patient_age,tf.admission_number,
+		tf.patient_diagnose,tf.dept_name,tf.main_minder,tf.occurrence_address,tf.occurrence_time,
+		tf.fall_patient_reason,tf.fall_patient_reason_remarks,tf.fall_medical_reason,
+		tf.fall_environment_reason,tf.fall_other_reason,tf.fall_other_reason_remarks,
+		tf.fall_cause_trauma,tf.fall_cause_trauma_level,tf.total_fall_num,tf.handling_information,tf.nurse_name,
+		tf.discussion_time,tf.question_master,tf.discussion_record,tf.participant_name,tf.dept_id,tf.del_flag,
+		tf.create_user_id,tf.create_time,tf.update_time,tf.update_user_id,
+		tf.del_time,tf.del_user_id
+	</sql>
+
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.patient.TumbleFall"
+			resultMap="TumbleFallMap">
+
+		SELECT
+		<include refid="Map_List"/>
+		FROM
+		pat_tumble_fall tf
+		WHERE
+		tf.del_flag = 0
+		/*查询护士关联的患者 当患者为null时 */
+		<if test="query.deptId != null">
+			and tf.dept_id = #{query.deptId}
+		</if>
+		<if test="(query.patientId == null or query.patientId =='') and query.createUserId != null and query.createUserId != ''">
+			and tf.patient_id IN (
+			SELECT
+			patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.createUserId}
+			)
+		</if>
+		<if test=" query.patientId != null and query.patientId != '' ">
+			and tf.patient_id = #{query.patientId}
+		</if>
+		order by tf.create_time desc
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.AdverseDrugReactionsRecordMapper">
+
+
+
+	<!-- 患者药物不良反应查询 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.patient.AdverseDrugReactionsRecord" resultMap="AdverseDrugReactionsRecordMap">
+
+		select
+			d.id,
+			d.his_doctors_advice_id,
+			d.doctors_advice_content,
+			d.patient_id,
+			d.patient_name,
+			d.gender,
+			d.hospitalnumber,
+			d.age,
+			d.diagnosis,
+			d.start_time,
+			d.end_time,
+			d.occurrence_time,
+			d.adverse_name,
+			d.symptom,
+			d.drug_name,
+			d.dose,
+			d.treat_process,
+			d.treat_result,
+			d.create_user_id,
+		    d.create_user_id,
+		    d.del_flag,
+			n.real_name as  nurse_name
+			from pat_adverse_drug_reactions_record d
+			left join nur_nurse n on d.create_user_id = n.nurse_id
+			<where>
+				d.del_flag=0
+				<if test="adverseDrugReactionsRecord.patientId !=null and adverseDrugReactionsRecord.patientId !=''">
+					and d.patient_id = #{adverseDrugReactionsRecord.patientId}
+				</if>
+				<if test="adverseDrugReactionsRecord.deptId !=null and adverseDrugReactionsRecord.deptId !=''">
+					and d.dept_id = #{adverseDrugReactionsRecord.deptId}
+				</if>
+				<if test="adverseDrugReactionsRecord.drugName !=null and adverseDrugReactionsRecord.drugName !=''">
+					and <![CDATA[d.drug_name  like concat('%',#{adverseDrugReactionsRecord.drugName},'%')]]>
+				</if>
+			</where>
+			order by d.id desc
+
+	</select>
+
+
+
+
+	<resultMap id="AdverseDrugReactionsRecordMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.patient.AdverseDrugReactionsRecordVo">
+		<id property="id" column="id"/>
+		<result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+		<result property="doctorsAdviceContent" column="doctors_advice_content"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="gender" column="gender"/>
+		<result property="hospitalnumber" column="hospitalnumber"/>
+		<result property="age" column="age"/>
+		<result property="diagnosis" column="diagnosis"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="occurrenceTime" column="occurrence_time"/>
+		<result property="adverseName" column="adverse_name"/>
+		<result property="symptom" column="symptom"/>
+		<result property="drugName" column="drug_name"/>
+		<result property="dose" column="dose"/>
+		<result property="treatProcess" column="treat_process"/>
+		<result property="treatResult" column="treat_result"/>
+		<result property="createUserId" column="create_user_id"/>
+
+		<result property="nurseName" column="nurse_name"/>
+	</resultMap>
+
+
+
+
+
+
+
+
+
+
+  <resultMap id="AdverseDrugReactionsRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.AdverseDrugReactionsRecord">
+                  <id property="id" column="id"/>
+                        <result property="hisDoctorsAdviceId" column="his_doctors_advice_id"/>
+                        <result property="doctorsAdviceContent" column="doctors_advice_content"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="patientName" column="patient_name"/>
+                        <result property="gender" column="gender"/>
+                        <result property="hospitalnumber" column="hospitalnumber"/>
+                        <result property="age" column="age"/>
+                        <result property="diagnosis" column="diagnosis"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="endTime" column="end_time"/>
+                        <result property="occurrenceTime" column="occurrence_time"/>
+                        <result property="adverseName" column="adverse_name"/>
+                        <result property="symptom" column="symptom"/>
+                        <result property="drugName" column="drug_name"/>
+                        <result property="dose" column="dose"/>
+                        <result property="treatProcess" column="treat_process"/>
+                        <result property="treatResult" column="treat_result"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+            </resultMap>
+</mapper>

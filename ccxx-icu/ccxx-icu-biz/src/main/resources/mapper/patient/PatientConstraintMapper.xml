@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.PatientConstraintMapper">
+
+	<resultMap id="PatientConstraintMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.PatientConstraint">
+		<id property="id" column="id"/>
+		<result property="patientConstraintId" column="patient_constraint_id"/>
+		<result property="constraintCause" column="constraint_cause"/>
+		<result property="constraintTime" column="constraint_time"/>
+		<result property="constraintNumber" column="constraint_number"/>
+		<result property="constraintPartDescribe" column="constraint_part_describe"/>
+		<result property="patientResponse" column="patient_response"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientName" column="patient_name"/>
+		<result property="ifKnowInform" column="if_know_inform"/>
+		<result property="patientComplication" column="patient_complication"/>
+		<result property="complicationManage" column="complication_manage"/>
+		<result property="executeNurse" column="execute_nurse"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+	<sql id="Map_List">
+		ppc.id,ppc.patient_constraint_id,ppc.constraint_cause,ppc.constraint_time,ppc.constraint_number,
+		ppc.constraint_part_describe,ppc.patient_response,ppc.patient_id,ppc.patient_name,ppc.if_know_inform,
+		ppc.patient_complication,ppc.complication_manage,ppc.execute_nurse,
+		ppc.dept_id,ppc.del_flag,ppc.create_user_id,ppc.create_time,ppc.update_time,ppc.update_user_id,ppc.del_time,
+		ppc.del_user_id
+
+	</sql>
+
+	<select id="getByPage" resultMap="PatientConstraintMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.patient.PatientConstraint">
+
+		SELECT
+		DISTINCT
+		ppc.id,
+		ppc.patient_constraint_id,
+		ppc.constraint_cause,
+		ppc.constraint_time,
+		ppc.constraint_number,
+		ppc.constraint_part_describe,
+		ppc.patient_response,
+		ppc.patient_id,
+		ppc.patient_name,
+		ppc.if_know_inform,
+		ppc.patient_complication,
+		ppc.complication_manage,
+		ppc.execute_nurse,
+		ppc.dept_id,
+		ppc.del_flag,
+		ppc.create_user_id,
+		ppc.create_time,
+		ppc.update_time,
+		ppc.update_user_id,
+		ppc.del_time,
+		ppc.del_user_id
+		FROM
+			pat_patient_constraint ppc
+		LEFT JOIN nur_nurse_patient_correlation npc ON npc.patient_id = ppc.patient_id
+		WHERE
+			ppc.del_flag = 0
+		<if test="query.deptId != null">
+		and ppc.dept_id = #{query.deptId}
+		</if>
+		<if test="query.patientId != null">
+		and ppc.patient_id = #{query.patientId}
+		</if>
+		<if test="query.patientId == null and query.createUserId !=null">
+		and npc.nurse_id = #{query.createUserId}
+		</if>
+		<if test="query.executeNurse !=null and query.executeNurse != ''">
+			and ppc.execute_nurse like  CONCAT('%',#{query.executeNurse},'%')
+		</if>
+		order by ppc.create_time desc
+
+	</select>
+
+
+
+
+</mapper>

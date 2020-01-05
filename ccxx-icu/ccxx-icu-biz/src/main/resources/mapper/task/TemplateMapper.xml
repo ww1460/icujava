@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.TemplateMapper">
+
+
+	<!-- 任务模板全查 -->
+	<select id="selectAll" resultMap="takTemplateMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TemplateVo">
+		select
+		t.id,
+		t.template_id,
+		t.template_content,
+		t.template_describe,
+		t.source_id,
+		t.source,
+		t.purpose,
+		t.sub_task_num,
+		t.del_flag,
+		t.dept_id,
+		r.name as r_name,
+		r.project_id
+		FROM tak_template t
+		left join tak_nursing_task_relation r on t.template_id = r.tak_template_id
+		  <where>
+			  t.del_flag =0 and  source !=2
+			  <if test="template.purpose !=null">
+				  and t.purpose = #{template.purpose}
+			  </if>
+			  <if test="template.loginNurse !=null">
+				  and(t.create_user_id =#{template.loginNurse} or t.purpose = 1)
+			  </if>
+			  <if test="template.deptId !=null">
+				  and t.dept_id = #{template.deptId}
+			  </if>
+
+			 </where>
+	</select>
+
+	<!-- 任务模板分页查询-->
+	<select id="selectPaging" resultMap="takTemplateMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TemplateVo">
+		select
+		t.id,
+		t.template_id,
+		t.template_content,
+		t.template_describe,
+		t.source_id,
+		t.source,
+		t.purpose,
+		t.sub_task_num,
+		t.del_flag,
+		t.dept_id,
+		r.name as r_name
+		FROM tak_template t
+		left join tak_nursing_task_relation r on t.template_id = r.tak_template_id
+		<where>
+			t.del_flag =0
+			<if test="template.source !=null">
+				and t.source = #{template.source}
+			</if>
+			<if test="template.purpose !=null">
+				and t.purpose = #{template.purpose}
+			</if>
+			<if test="template.loginNurse !=null">
+			and (t.create_user_id =#{template.loginNurse} or t.purpose = 1)
+		</if>
+		<if test="template.deptId !=null">
+			and t.dept_id = #{template.deptId}
+		</if>
+		</where>
+	</select>
+
+	<!-- 雪花id查询          -->
+	<select id="getTemplateId" resultMap="takTemplateMap" parameterType="java.lang.String">
+			select
+			id,
+			template_id,
+			template_content,
+			template_describe,
+			source,
+			purpose,
+			dept_id,
+			sub_task_num,
+			source_id,
+			del_flag
+			 FROM tak_template
+			 <where>
+				 <if test="templateId !=null">
+					 template_id = #{templateId}
+				 </if>
+			 </where>
+	</select>
+
+	<!-- 查询子任务新增前所展示任务模板的数据 【没有快捷的模板数据】-->
+	<select id="selectTaskPreJump" resultMap="takTemplateMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TemplateVo">
+		select
+		t.id,
+		t.template_id,
+		t.template_content,
+		t.template_describe,
+		t.source_id,
+		t.source,
+		t.purpose,
+		t.sub_task_num,
+		t.del_flag,
+		t.dept_id,
+		r.name as r_name
+		FROM tak_template t
+		left join tak_nursing_task_relation r on t.template_id = r.tak_template_id
+		<where>
+			t.del_flag =0 and t.source !=9 and t.source !=5
+			<if test="template.loginNurse !=null">
+				and (t.create_user_id =#{template.loginNurse} or t.purpose = 1)
+			</if>
+			<if test="template.deptId !=null">
+				and t.dept_id = #{template.deptId}
+			</if>
+		</where>
+	</select>
+
+	<!--模板的来源id 查询数据-->
+		<select id="source" resultMap="takTemplateMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.Template" >
+			SELECT * from tak_template
+			<where>
+				del_flag = 0
+				<if test="template.source !=null">
+					and source = #{template.source}
+				</if>
+				<if test="template.deptId !=null">
+					and dept_id = #{template.deptId }
+				</if>
+			</where>
+
+		</select>
+
+
+
+
+
+	<resultMap id="takTemplateMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.TemplateVo">
+		<id property="id" column="id"/>
+		<result property="templateId" column="template_id"/>
+		<result property="templateContent" column="template_content"/>
+		<result property="templateDescribe" column="template_describe"/>
+		<result property="sourceId" column="source_id"/>
+		<result property="source" column="source"/>
+		<result property="purpose" column="purpose"/>
+		<result property="subTaskNum" column="sub_task_num"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="projectName" column="r_name"/>
+
+	</resultMap>
+
+
+  <resultMap id="takTemplateMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.Template">
+                  <id property="id" column="id"/>
+                        <result property="templateId" column="template_id"/>
+                        <result property="templateContent" column="template_content"/>
+                        <result property="templateDescribe" column="template_describe"/>
+	 					 <result property="sourceId" column="source_id"/>
+                        <result property="source" column="source"/>
+                        <result property="purpose" column="purpose"/>
+                        <result property="subTaskNum" column="sub_task_num"/>
+	  					<result property="deptId" column="dept_id"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

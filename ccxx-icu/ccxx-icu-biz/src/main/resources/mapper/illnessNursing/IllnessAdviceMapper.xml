@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.illnessNursing.IllnessAdviceMapper">
+
+	<resultMap id="IllnessAdviceMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.illnessNursing.IllnessAdvice">
+		<id property="id" column="id"/>
+		<result property="illnessAdviceId" column="illness_advice_id"/>
+		<result property="illnessProjectId" column="illness_project_id"/>
+		<result property="illnessState" column="illness_state"/>
+		<result property="nursingAdvice" column="nursing_advice"/>
+		<result property="remarks" column="remarks"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+<sql id="Map_List">
+
+	ia.id,ia.illness_advice_id,ia.illness_project_id,ia.nursing_advice,ia.remarks,ia.del_flag,ia.del_time,
+	ia.del_user_id,ia.create_user_id,ia.create_time,ia.update_time,ia.update_user_id
+
+</sql>
+
+	<select id="selectByPage" resultType="com.baomidou.mybatisplus.core.metadata.IPage"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.IllnessAdviceBo">
+			  SELECT
+				ia.id,
+				ia.illness_advice_id,
+				ia.nursing_advice,
+				ia.illness_project_id,
+				ia.create_time,
+				npl.project_name,
+				npl.project_code
+			  FROM
+				nur_illness_advice ia
+			  LEFT JOIN nur_illness_project nip ON nip.illness_project_id = ia.illness_project_id
+			  LEFT JOIN nur_project npl on npl.project_id = nip.project_id
+			  WHERE
+				ia.del_flag = 0
+			  and npl.del_flag = 0
+			  <if test="query.illnessProjectId != null">
+
+				and ia.illness_project_id = #{query.illnessProjectId}
+
+			  </if>
+			  <if test="query.projectName != null and query.projectName != ''">
+				  and
+				  npl.project_name like CONCAT('%',#{query.projectName},'%')
+			  </if>
+	</select>
+
+	<select id="getAdvice" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.IllnessAdviceVo">
+
+		SELECT
+			ia.id,
+			ia.illness_advice_id,
+			ia.nursing_advice,
+			ia.illness_project_id
+		FROM
+			nur_illness_advice ia
+		LEFT JOIN nur_project_advice_correlation pac ON pac.nursing_advice_id = ia.illness_advice_id
+		WHERE
+			ia.del_flag = 0
+		AND pac.del_flag = 0
+		AND pac.project_state_id = #{projectStateId}
+
+	</select>
+
+	<select id="selectAdvice" resultMap="IllnessAdviceMap">
+
+		SELECT
+			<include refid="Map_List"/>
+		FROM
+			nur_illness_advice ia
+		LEFT JOIN nur_project_advice_correlation pac ON pac.nursing_advice_id = ia.illness_advice_id
+		WHERE
+			ia.del_flag = 0
+		AND pac.del_flag = 0
+		AND pac.project_state_id = #{projectStateId}
+
+	</select>
+
+
+</mapper>

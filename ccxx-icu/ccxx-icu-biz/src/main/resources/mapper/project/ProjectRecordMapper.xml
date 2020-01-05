@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.project.ProjectRecordMapper">
+
+	<resultMap id="ProjectRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectRecord">
+		<id property="id" column="id"/>
+		<result property="projectRecordId" column="project_record_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="projectSpecificRecord" column="project_specific_record"/>
+		<result property="projectValue" column="project_value"/>
+		<result property="source" column="source"/>
+		<result property="sourceId" column="source_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="remarks" column="remarks"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+	<sql id="Map_List">
+
+		id,project_record_id,project_id,project_specific_record,project_value,source,source_id,
+		patient_id,remarks,dept_id,del_flag,del_time,del_user_id,create_user_id,create_time,update_time,update_user_id
+
+	</sql>
+	<!--项目记录分页查询-->
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.ProjectRecordBo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.project.ProjectRecordVo">
+
+		SELECT
+		pr.id,
+		pr.project_record_id,
+		pr.project_value,
+		pr.project_specific_record,
+		pr.dept_id,
+		pr.project_id,
+		pr.source,
+		pr.patient_id,
+		pr.remarks,
+		pl.project_name,
+		hb.bed_code,
+		p.`name` as patientName,
+		n.real_name as createName,
+		pr.create_time
+		FROM
+		nur_project_record pr
+		LEFT JOIN nur_project pl ON pl.project_id = pr.project_id
+		LEFT JOIN pat_patient p ON p.patient_id = pr.patient_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = pr.create_user_id
+		LEFT JOIN pat_patient_bed_correlation pbc ON pbc.patient_id = pr.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id
+		where
+		pr.del_flag = 0
+		<if test="query.deptId != null">
+			and pr.dept_id = #{query.deptId}
+		</if>
+		<if test="query.patientId != null and query.patientId != ''">
+			and
+			pr.patient_id= #{query.patientId}
+		</if>
+		<if test="query.range == 0 and(query.patientId == null or query.patientId =='') and query.nurseId != null and query.nurseId != ''">
+			and pr.patient_id IN (
+			SELECT
+			npc.patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.nurseId}
+			)
+		</if>
+
+		<if test="query.projectName != null and  query.projectName != ''">
+			and
+			pl.project_name like CONCAT('%',#{query.projectName},'%')
+		</if>
+		<if test="query.range == 0 and query.createUserId != null and query.createUserId != ''">
+			and pr.create_user_id = #{query.nurseId}
+		</if>
+		order by pr.create_time desc
+
+	</select>
+
+	<!--获取某患者某项目的最新一条记录-->
+	<select id="getOneRecord" parameterType="java.lang.String" resultMap="ProjectRecordMap">
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_project_record
+		where
+		del_flag = 0
+		and
+		project_id =#{projectId}
+		and
+		patient_id = #{patientId}
+		order by create_time desc
+		limit 1
+
+	</select>
+	<!--获取某护理记录的关联数据-->
+	<select id="getValueCorrelation" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nursing.NursingProjectVo"
+			parameterType="java.lang.String">
+
+		SELECT
+			npr.id,
+			npr.project_record_id,
+			npr.project_id,
+			npr.project_specific_record,
+			npr.project_value,
+			npr.source,
+			npr.source_id,
+			npr.patient_id,
+			npr.remarks,
+			npr.dept_id,
+			npr.del_flag,
+			npr.del_time,
+			npr.del_user_id,
+			npr.create_user_id,
+			npr.create_time,
+			npr.update_time,
+			npr.update_user_id,
+			npl.project_name,
+			npl.project_type,
+			npl.project_warm_flag
+		FROM
+			nur_project_record npr
+		LEFT JOIN nur_project npl ON npl.project_id = npr.project_id
+		WHERE
+			npr.del_flag = 0
+		AND npr.source_id = #{sourceId}
+		ORDER BY
+			npr.id ASC
+
+	</select>
+	
+	<!--查询某小时的全部数据-->
+	<select id="getAllRecord" resultMap="ProjectRecordMap">
+		select
+		<include refid="Map_List"/>
+		from
+		nur_project_record
+		where
+		del_flag = 0
+		and date_format(create_time,'%Y-%m-%d %H')= date_format(#{createTime},'%Y-%m-%d %H')
+		ORDER BY create_time desc
+	</select>
+	<!--查询某患者某小时的全部数据-->
+	<select id="getAllRecordByPatient" resultMap="ProjectRecordMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+		select
+		<include refid="Map_List"/>
+		from
+		nur_project_record
+		where
+		del_flag = 0
+		and date_format(create_time,'%Y-%m-%d %H')= date_format(#{startTime},'%Y-%m-%d %H')
+		and patient_id = #{patientId}
+		ORDER BY create_time desc
+	</select>
+	
+
+
+</mapper>

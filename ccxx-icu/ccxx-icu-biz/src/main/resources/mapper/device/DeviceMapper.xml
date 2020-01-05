@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.device.DeviceMapper">
+
+	<!-- 通过自增id 查询数据 如有需要请自行添加 -->
+	<select id="selectByDeviceId" resultMap="SelectByEquipment" parameterType="java.lang.String">
+		SELECT
+		id,
+		name,
+		device_id,
+		state
+		from dev_device
+		<where>
+			del_flag = 0
+			<if test="deviceId !=null and deviceId  !=''">
+				and device_id = #{deviceId}
+			</if>
+		</where>
+	</select>
+
+
+	<resultMap id="SelectByEquipment" type="com.pig4cloud.pigx.ccxxicu.api.entity.device.Device">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="deviceId" column="device_id"/>
+		<result property="state" column="state"/>
+	</resultMap>
+
+
+	<!--  条件查询数据  -->
+	<select id="selectAll" resultMap="devDeviceMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.device.Device">
+		select
+		id,
+		device_id,
+		name,
+		model,
+		rfid_id,
+		device_number,
+		state,
+		factory,
+		contacts,
+		cell_phone_number,
+		dealer,
+		dept_id,
+		use_time
+		from dev_device
+		<where>
+			del_flag = 0
+			<if test="device.deviceId !=null and device.deviceId  !=''">
+				and device_id = #{device.deviceId}
+			</if>
+			<if test="device.state !=null and device.state  !=''">
+				and state = #{device.state}
+			</if>
+			<if test="device.deptId !=null and device.deptId  !=''">
+				and dept_id = #{device.deptId}
+			</if>
+			<if test="device.name !=null and device.name !=''">
+				and name like CONCAT('%',#{device.name},'%')
+			</if>
+		</where>
+		order by id DESC
+
+	</select>
+
+	<resultMap id="devDeviceMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.device.Device">
+                  <id property="id" column="id"/>
+                        <result property="deviceId" column="device_id"/>
+                        <result property="name" column="name"/>
+                        <result property="model" column="model"/>
+                        <result property="rfidId" column="rfid_id"/>
+                        <result property="deviceNumber" column="device_number"/>
+                        <result property="state" column="state"/>
+                        <result property="factory" column="factory"/>
+                        <result property="contacts" column="contacts"/>
+                        <result property="cellPhoneNumber" column="cell_phone_number"/>
+                        <result property="dealer" column="dealer"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="useTime" column="use_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="updateUserId" column="update_user_id"/>
+            </resultMap>
+
+	<!--  条件查询数据  -->
+	<select id="getOnlineDevice" resultMap="devDeviceMap">
+		select
+		*
+		from dev_device device
+		where device.del_flag =0
+		and device.state = 1
+	</select>
+
+</mapper>

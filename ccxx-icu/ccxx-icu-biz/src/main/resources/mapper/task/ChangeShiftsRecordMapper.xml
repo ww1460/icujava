@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.task.ChangeShiftsRecordMapper">
+
+
+
+
+	<!-- 交班任务查询 -->
+	<select id="shiftsTask" parameterType="com.pig4cloud.pigx.ccxxicu.api.vo.task.TaskVo"  resultMap="takTaskMapShifts">
+		select
+		task.id,
+		task.task_sub_task_id,
+		task.task_name,
+		task.task_describe,
+		task.patient_id,
+		task.state,
+		des.id as desId,
+		des.shifts_task_describe as des_shifts_task_describe
+		from tak_task_sub_task task
+		left join tak_change_shifts_describe des on task.task_sub_task_id =  des.task_id
+		<where>
+			task.del_flag =0 and task.state!=3  and task.state!=4
+			<if test="task.deptId != null">
+				and  task.dept_id = #{task.deptId}
+			</if>
+			<if test="task.patientId != null">
+				and  task.patient_id = #{task.patientId}
+			</if>
+		</where>
+		and task.patient_id in (
+		SELECT  cor.patient_id FROM nur_nurse_patient_correlation cor
+		<where>
+			<if test="task.associatedNurse !=null">
+				cor.nurse_id = #{task.associatedNurse}
+			</if>
+
+		</where>
+		)
+		ORDER BY task.state ,task.emergency desc ,task.id  desc
+
+	</select>
+
+	<resultMap id="takTaskMapShifts" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.ChangeShiftsVo">
+		<id property="id" column="id"/>
+		<result property="taskSubTaskId" column="task_sub_task_id"/>
+		<result property="taskName" column="task_name"/>
+		<result property="taskDescribe" column="task_describe"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="taskState" column="state"/>
+		<result property="temporaryTaskDescribe" column="des_shifts_task_describe"/>
+
+	</resultMap>
+
+
+
+	<!-- 雪花id查询 -->
+	<select id="getRecordId" parameterType="java.lang.String" resultMap="takChangeShiftsRecordMapVo">
+		select
+		rec.id,
+		rec.change_shifts_record_id,
+		rec.patient_id,
+		rec.shift_nurse_id,
+		rec.shift_time,
+		rec.succession_nurse_id,
+		rec.succession_time,
+		rec.state,
+		rec.shift_describe,
+		pat.`name` as patname,
+		pat.gender as gender,
+		pat.age as age,
+		pat.diagnosis as diagnosis
+		from tak_change_shifts_record rec
+		left join pat_patient pat on rec.patient_id  = pat.patient_id
+		<where>
+			<if test="changeShiftsRecordId !=null">
+				and rec.change_shifts_record_id = #{changeShiftsRecordId}
+			</if>
+		</where>
+
+
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- 全查数据 -->
+	<select id="selectAll" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.task.ChangeShiftsRecord" resultMap="takChangeShiftsRecordMapVo">
+		select
+			rec.id,
+			rec.change_shifts_record_id,
+			rec.patient_id,
+			rec.shift_nurse_id,
+			rec.shift_time,
+			rec.succession_nurse_id,
+			rec.succession_time,
+			rec.state,
+			rec.shift_describe,
+			pat.`name` as patname,
+			pat.gender as gender,
+			pat.age as age,
+			pat.diagnosis as diagnosis,
+			bed.bed_name,
+			pat.entrance_time
+			from tak_change_shifts_record rec
+			left join pat_patient pat on rec.patient_id  = pat.patient_id
+			left join nur_hospital_bed bed on pat.admission_beds = bed.bed_id
+			<where>
+				rec.del_flag = 0
+				<if test="changeShiftsRecord.state!=null">
+				and rec.state = #{changeShiftsRecord.state}
+				</if>
+			</where>
+
+
+	</select>
+
+
+	<resultMap id="takChangeShiftsRecordMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.task.ChangeShiftsRecordVo">
+		<id property="id" column="id"/>
+		<result property="changeShiftsRecordId" column="change_shifts_record_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="shiftNurseId" column="shift_nurse_id"/>
+		<result property="shiftTime" column="shift_time"/>
+		<result property="successionNurseId" column="succession_nurse_id"/>
+		<result property="successionTime" column="succession_time"/>
+		<result property="state" column="state"/>
+		<result property="taskCondition" column="task_condition"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="shiftDescribe" column="shift_describe"/>
+
+		<result property="patientName" column="patname"/>
+		<result property="patientGenter" column="gender"/>
+		<result property="patientAge" column="age"/>
+		<result property="patientDiagnosis" column="diagnosis"/>
+		<result property="bedName" column="bed_name"/>
+		<result property="entranceTime" column="entrance_time"/>
+	</resultMap>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <resultMap id="takChangeShiftsRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.task.ChangeShiftsRecord">
+                  <id property="id" column="id"/>
+                        <result property="changeShiftsRecordId" column="change_shifts_record_id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="shiftNurseId" column="shift_nurse_id"/>
+                        <result property="shiftTime" column="shift_time"/>
+                        <result property="successionNurseId" column="succession_nurse_id"/>
+                        <result property="successionTime" column="succession_time"/>
+                        <result property="state" column="state"/>
+                        <result property="taskCondition" column="task_condition"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+	  					<result property="shiftDescribe" column="shift_describe"/>
+
+  </resultMap>
+</mapper>

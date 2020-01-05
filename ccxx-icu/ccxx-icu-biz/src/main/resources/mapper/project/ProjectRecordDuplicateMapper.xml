@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.project.ProjectRecordDuplicateMapper">
+
+	<resultMap id="ProjectRecordDuplicateMap"
+			   type="com.pig4cloud.pigx.ccxxicu.api.entity.project.ProjectRecordDuplicate">
+		<id property="id" column="id"/>
+		<result property="projectRecordDuplicateId" column="project_record_duplicate_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="projectSpecificRecord" column="project_specific_record"/>
+		<result property="projectValue" column="project_value"/>
+		<result property="source" column="source"/>
+		<result property="sourceId" column="source_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="remarks" column="remarks"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+
+	<sql id="Map_List">
+
+		id,project_record_duplicate_id,project_id,project_specific_record,project_value,source,
+		source_id,patient_id,remarks,dept_id,del_flag,del_time,del_user_id,create_user_id,
+		create_time,update_time,update_user_id
+
+	</sql>
+
+	<resultMap id="reportResult" type="com.pig4cloud.pigx.ccxxicu.api.vo.project.NursingReportVo">
+		<result property="id" column="idd"/>
+		<result property="projectId" column="project_idd"/>
+		<result property="projectName" column="project_name"/>
+		<result property="projectCode" column="project_code"/>
+		<result property="projectType" column="project_type"/>
+		<result property="projectRecordValueFlag" column="project_record_value_flag"/>
+		<result property="showWayFlag" column="show_way_flag"/>
+		<result property="showIndex" column="show_index"/>
+		<collection property="projectRecordDuplicates" resultMap="ProjectRecordDuplicateMap"/>
+	</resultMap>
+
+
+	<select id="getRecord" resultMap="reportResult"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+			pl.id as idd,
+			pl.project_name,
+			pl.project_type,
+			pl.project_code,
+			pl.project_id as project_idd,
+			pl.project_record_value_flag,
+			pc.show_way_flag,
+			prd.id,
+			prd.patient_id,
+			prd.project_id,
+			prd.project_record_duplicate_id,
+			prd.project_specific_record,
+			prd.project_value,
+			prd.dept_id,
+			prd.create_time,
+			prd.create_user_id,
+			pc.show_index
+		from
+			nur_project_record_duplicate prd
+		left join nur_project pl on pl.project_id = prd.project_id
+		left join nur_project_correlation pc on pc.project_id= pl.project_id
+		where
+			pl.del_flag = 0
+		and prd.del_flag = 0
+			<if test=" nursingReportFlag !=null">
+				and pc.nursing_report_flag = #{nursingReportFlag}
+			</if>
+		and prd.patient_id = #{patientId}
+		and date_format(prd.create_time,'%Y-%m-%d %H') >= date_format(#{startTime},'%Y-%m-%d %H')
+		and date_format(#{endTime},'%Y-%m-%d %H') >= date_format(prd.create_time,'%Y-%m-%d %H')
+		order by prd.create_time ,pc.show_index
+	</select>
+
+
+	<select id="getVital" resultMap="reportResult"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+		pl.id as idd,
+		pl.project_name,
+		pl.project_type,
+		pl.project_code,
+		pl.project_id as project_idd,
+		pl.project_record_value_flag,
+		prd.id,
+		prd.patient_id,
+		prd.project_id,
+		prd.project_record_duplicate_id,
+		prd.project_specific_record,
+		prd.project_value,
+		prd.dept_id,
+		prd.create_time,
+		prd.create_user_id,
+		pc.show_index
+		from
+		nur_project_record_duplicate prd
+		left join nur_project pl on pl.project_id = prd.project_id
+		left join nur_project_correlation pc on pc.project_id= pl.project_id
+		where
+			pl.del_flag = 0
+		and prd.del_flag = 0
+		and pc.nursing_report_flag = 3
+		and prd.patient_id = #{patientId}
+		and date_format(prd.create_time,'%Y-%m-%d %H') >= date_format(#{startTime},'%Y-%m-%d %H')
+		and date_format(#{endTime},'%Y-%m-%d %H') >= date_format(prd.create_time,'%Y-%m-%d %H')
+		order by prd.create_time ,pc.show_index
+	</select>
+
+
+	<!--获取某记录单的项目-->
+	<select id="selectReportProject" resultMap="reportResult"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+			pl.id as idd,
+			pl.project_name,
+			pl.project_type,
+			pl.project_code,
+			pl.project_id as project_idd,
+			pl.project_record_value_flag,
+			pc.show_way_flag,
+			pc.show_index
+		from
+			nur_project pl
+		left join nur_project_correlation pc on pc.project_id= pl.project_id
+		where
+			pl.del_flag = 0
+		<if test=" nursingReportFlag !=null">
+			and pc.nursing_report_flag = #{nursingReportFlag}
+		</if>
+		<if test=" deptId !=null">
+			and pc.dept_id = #{deptId}
+		</if>
+		order by pl.id asc
+
+	</select>
+
+
+	<select id="selectVitalProject" resultMap="reportResult"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+		pl.id as idd,
+		pl.project_name,
+		pl.project_type,
+		pl.project_code,
+		pl.project_id as project_idd,
+		pl.project_record_value_flag
+		from
+		nur_project pl
+		where
+		pl.del_flag = 0
+		and pl.project_type = 1
+		<if test=" deptId !=null">
+			and pl.dept_id = #{deptId}
+		</if>
+		order by pl.id asc
+
+	</select>
+
+
+
+	<select id="getHistoryRecord" resultMap="ProjectRecordDuplicateMap" >
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_project_record_duplicate
+		where
+		del_flag = 0
+		and
+		date_format(create_time,'%Y-%m-%d %H') = date_format(#{startTime},'%Y-%m-%d %H')
+
+
+	</select>
+
+	<select id="getRecordByPatientId" resultMap="ProjectRecordDuplicateMap" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_project_record_duplicate
+		where
+		del_flag = 0
+		and
+		date_format(create_time,'%Y-%m-%d %H') = date_format(#{startTime},'%Y-%m-%d %H')
+		and patient_id = #{patientId}
+
+	</select>
+
+	<sql id="List_Map">
+	n.id,n.nurse_id,n.user_id,n.nurse_grade,n.his_nurse_id,n.dept_id,n.motto,n.signature,n.nurse_rfid,n.role_flag,n.real_name,n.gender,n.create_user_id,
+	n.create_time,n.update_user_id,	n.update_time,n.del_flag,n.del_time,n.del_user_id
+	</sql>
+
+	<select id="getCreateName" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.Nurse"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.NursingBo">
+
+		select
+			<include refid="List_Map"/>
+		from
+		nur_project_record_duplicate prd
+		left join nur_project pl on pl.project_id = prd.project_id
+		left join nur_project_correlation pc on pc.project_id= pl.project_id
+		left join nur_nurse n on prd.create_user_id = n.nurse_id
+		where
+		pl.del_flag = 0
+		and prd.del_flag = 0
+		<if test=" nursingReportFlag !=null">
+			and pc.nursing_report_flag = #{nursingReportFlag}
+		</if>
+		and prd.patient_id = #{patientId}
+		and date_format(prd.create_time,'%Y-%m-%d %H') >= date_format(#{startTime},'%Y-%m-%d %H')
+		order by prd.id
+		limit 1
+	</select>
+
+
+</mapper>

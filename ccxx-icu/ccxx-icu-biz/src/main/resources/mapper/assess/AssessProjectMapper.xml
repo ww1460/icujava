@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.assess.AssessProjectMapper">
+
+	<resultMap id="AssessProjectMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.assess.AssessProject">
+		<id property="id" column="id"/>
+		<result property="assessProjectId" column="assess_project_id"/>
+		<result property="assessTypeId" column="assess_type_id"/>
+		<result property="assessProjectName" column="assess_project_name"/>
+		<result property="assessProjectCode" column="assess_project_code"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+	<sql id="Map_List">
+
+		id,assess_project_id,assess_type_id,assess_project_name,assess_project_code,del_flag,create_user_id,create_time,update_time,update_user_id,del_time,del_user_id
+
+	</sql>
+	<!--获取某类型的项目-->
+	<select id="getType" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.assess.AssessProject" >
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_assess_project
+		where
+		del_flag = 0
+		and
+		assess_type_id = #{assessTypeId}
+
+	</select>
+	<!--获取某项目的所有条件-->
+	<select id="getCondition" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.assess.AssessProject" >
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_assess_project
+		where
+		del_flag = 0
+		and
+		assess_project_name = #{assessProjectName}
+
+
+
+	</select>
+
+
+
+
+
+
+</mapper>

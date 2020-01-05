@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.patient.PatientBedCorrelationMapper">
+
+	<resultMap id="PatientBedCorrelationMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.patient.PatientBedCorrelation">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="bedId" column="bed_id"/>
+	</resultMap>
+
+	<sql id="Map_List">
+
+		id,patient_id,bed_id
+
+	</sql>
+
+	<sql id="List_map">
+
+		hb.id,hb.bed_id,hb.bed_name,hb.bed_code,hb.rfid,hb.use_flag,hb.dept_id,hb.del_time,hb.del_user_id,hb.update_time,hb.update_user_id,hb.create_user_id
+		,hb.create_time
+
+	</sql>
+
+	<!--根据患者或者床位查询-->
+	<select id="selectByCondition" resultMap="PatientBedCorrelationMap"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.patient.PatientBedCorrelation">
+		select
+		<include refid="Map_List"/>
+		from pat_patient_bed_correlation
+		<where>
+			<if test="patientId != null">
+				and patient_id = #{patientId}
+			</if>
+			<if test="bedId != null">
+				and bed_id = #{bedId}
+			</if>
+		</where>
+	</select>
+
+	<select id="getPatientBed" resultType="com.pig4cloud.pigx.ccxxicu.api.entity.bed.HospitalBed">
+
+		select
+			<include refid="List_map"/>
+		from
+			nur_hospital_bed hb
+		left join pat_patient_bed_correlation pbc on pbc.bed_id = hb.bed_id
+		where
+			hb.del_flag = 0
+		and
+			pbc.patient_id  = #{patientId}
+
+	</select>
+
+
+</mapper>

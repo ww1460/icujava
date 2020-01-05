@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.bed.BedRecordMapper">
+
+	<resultMap id="BedRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.bed.BedRecord">
+		<id property="id" column="id"/>
+		<result property="bedRecordId" column="bed_record_id"/>
+		<result property="bedId" column="bed_id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="totalTime" column="total_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+	</resultMap>
+
+	<sql id="Map_List">
+
+		id,bed_record_id,bed_id,patient_id,dept_id,start_time,end_time,total_time,del_flag,del_time,
+		del_user_id,create_user_id,create_time,update_time,update_user_id
+
+	</sql>
+	<sql id="Vo_Map_List">
+			pp.`name` AS patientName,
+			n.real_name AS nursName,
+			hb.bed_code,
+			hb.bed_name,
+			br.id,
+			br.bed_record_id,
+			br.bed_id,
+			br.patient_id,
+			br.dept_id,
+			br.start_time,
+			br.end_time,
+			br.total_time,
+			br.del_flag,
+			br.del_time,
+			br.del_user_id,
+			br.create_user_id,
+			br.create_time,
+			br.update_time,
+			br.update_user_id
+
+	</sql>
+
+	<!--根据患者和床位查询-->
+	<select id="selectByCondition" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.bed.BedRecord"
+			resultMap="BedRecordMap">
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_bed_record
+		<where>
+			del_flag = 0
+			and ( end_time is null
+			or end_time = '')
+			<if test="bedId !=null">
+				and bed_id = #{bedId}
+			</if>
+			<if test="patientId !=null">
+				and patient_id = #{patientId}
+			</if>
+			<if test="bedRecordId !=null">
+				and bed_record_id = #{bedRecordId}
+			</if>
+		</where>
+	</select>
+
+	<!--分页查询床位使用记录-->
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.BedRecordBo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.BedRecordVo">
+
+		SELECT
+		<include refid="Vo_Map_List"/>
+		FROM
+		nur_bed_record br
+		LEFT JOIN pat_patient pp ON pp.patient_id = br.patient_id and pp.del_flag = 0
+		LEFT JOIN nur_nurse n ON n.nurse_id = br.create_user_id and n.del_flag = 0
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = br.bed_id and hb.del_flag = 0
+		WHERE
+		br.del_flag = 0
+		<if test="query.bedId != null">
+			and br.bed_id = #{query.bedId}
+		</if>
+		<if test="query.deptId != null">
+			and br.dept_id = #{query.deptId}
+		</if>
+		<if test="query.bedCode != null and query.bedCode != ''">
+			and hb.bed_code LIKE CONCAT('%',#{query.bedCode},'%')
+		</if>
+		<if test="query.bedName != null and query.bedName != ''">
+			and hb.bed_name LIKE CONCAT('%',#{query.bedName},'%')
+		</if>
+		<if test="query.id != null">
+			and br.id = #{query.id}
+		</if>
+		<if test="query.bedRecordId != null">
+			and br.bed_record_id = #{query.bedRecordId}
+		</if>
+		<if test="query.firstTime != null">
+			and br.start_time >= #{query.firstTime}
+		</if>
+		<if test="query.lastTime != null">
+			and #{query.lastTime} >= br.start_time
+		</if>
+		order by br.update_time desc
+	</select>
+
+
+	<!--根据id查询-->
+	<!--<select id="selectById" resultType="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.BedRecordVo"
+			parameterType="java.lang.Integer">
+
+		SELECT
+		<include refid="Vo_Map_List"/>
+		FROM
+		nur_bed_record br
+		LEFT JOIN pat_patient pp ON pp.patient_id = br.patient_id
+		LEFT JOIN nur_nurse n ON n.nurse_id = br.create_user_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = br.bed_id
+		WHERE
+		br.del_flag = 0
+		and br.id = #{id}
+
+	</select>-->
+
+
+</mapper>

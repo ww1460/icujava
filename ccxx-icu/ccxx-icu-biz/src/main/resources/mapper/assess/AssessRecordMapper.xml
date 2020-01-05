@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.assess.AssessRecordMapper">
+
+	<resultMap id="AssessRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.assess.AssessRecord">
+		<id property="id" column="id"/>
+		<result property="assessRecordId" column="assess_record_id"/>
+		<result property="projectId" column="project_id"/>
+		<result property="assessResult" column="assess_result"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="remarks" column="remarks"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="updateUserId" column="update_user_id"/>
+		<result property="delTime" column="del_time"/>
+		<result property="delUserId" column="del_user_id"/>
+	</resultMap>
+
+
+	<select id="selectByPage" parameterType="com.pig4cloud.pigx.ccxxicu.api.Bo.nurseBo.AssessRecordBo"
+			resultType="com.pig4cloud.pigx.ccxxicu.api.vo.assess.AssessRecordShowVo">
+
+		SELECT
+		ar.id,
+		ar.assess_record_id,
+		ar.project_id,
+		ar.assess_result,
+		ar.patient_id,
+		ar.create_time,
+		ar.create_user_id,
+		pl.project_name,
+		pl.project_code,
+		p.`name` AS patientName,
+		n.real_name AS nurseName,
+		hb.bed_code
+		FROM
+		nur_assess_record ar
+		LEFT JOIN nur_project pl ON pl.project_id = ar.project_id and pl.del_flag = 0
+		LEFT JOIN pat_patient p ON p.patient_id = ar.patient_id and p.del_flag = 0
+		LEFT JOIN nur_nurse n ON n.nurse_id = ar.create_user_id and n.del_flag = 0
+		LEFT JOIN pat_patient_bed_correlation pbc ON ar.patient_id = pbc.patient_id
+		LEFT JOIN nur_hospital_bed hb ON hb.bed_id = pbc.bed_id and hb.del_flag = 0
+		WHERE
+		ar.del_flag = 0
+		<if test="query.deptId != null">
+			and ar.dept_id = #{query.deptId}
+		</if>
+		<if test="query.nurseId !=null and query.patientId ==null">
+			AND ar.patient_id IN (
+			SELECT
+			npc.patient_id
+			FROM
+			nur_nurse_patient_correlation npc
+			WHERE
+			npc.nurse_id = #{query.nurseId}
+			)
+		</if>
+		<if test="query.projectId != null">
+			AND ar.project_id = #{query.projectId}
+		</if>
+		<if test="query.patientId != null">
+			and ar.patient_id = #{query.patientId}
+		</if>
+		<if test="query.startTime != null">
+			and date_format(
+			ar.create_time,
+			'%Y-%m-%d'
+			) >= date_format(
+			#{query.startTime},
+			'%Y-%m-%d'
+			)
+		</if>
+		<if test="query.endTime != null">
+			AND date_format(
+			#{query.endTime},
+			'%Y-%m-%d'
+			) >= date_format(
+			ar.create_time,
+			'%Y-%m-%d'
+			)
+		</if>
+		<if test="query.minScore != null">
+			and cast(ar.assess_result as UNSIGNED INTEGER) >= #{query.minScore}
+		</if>
+		<if test="query.maxScore != null">
+			and #{query.maxScore} >= cast(ar.assess_result as UNSIGNED INTEGER)
+		</if>
+		<if test="query.projectName != null and query.projectName !='' ">
+			and pl.project_name LIKE CONCAT('%',#{query.projectName},'%')
+		</if>
+		ORDER BY
+		ar.create_time desc
+
+	</select>
+	<!--查询某患者现存的评估项目-->
+	<select id="getPatientAssessProject"
+			resultMap="com.pig4cloud.pigx.ccxxicu.mapper.project.ProjectMapper.ProjectListMap">
+
+		select
+		<include refid="Map_List"/>
+		from
+		nur_assess_record ar
+		left join nur_project np on np.project_id = ar.project_id
+		where
+		ar.del_flag = 0
+		and ar.patient_id = #{patientId}
+		group by ar.patient_id
+
+	</select>
+	<sql id="Map_List">
+
+		id,project_id,project_name,project_code,project_type,dept_id,project_warm_flag,illness_nursing_flag,project_record_value_flag,del_flag,del_user_id,del_time,
+		update_user_id,update_time,create_time,create_user_id
+
+	</sql>
+
+
+</mapper>

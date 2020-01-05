@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.piping.NursingMapper">
+
+
+	<!-- 分页查询数据 -->
+	<select id="selectPaging" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.piping.Nursing" resultMap="pipNursingMapVo">
+
+		select
+			n.id,
+			n.pip_nursing_id,
+			n.pip_use_record_id,
+			n.piping_start_time,
+			n.cannula_nurse_id,
+			n.patient_id,
+			n.preventive_measures,
+			n.nursing_outcomes,
+			n.causes_of_detachment,
+			n.patient_dynamics,
+			n.dept_id,
+			n.handle,
+			n.create_user_id,
+			n.del_flag,
+			p.piping_name as piping_name,
+			pat.`name` as pat_name,
+			nur.real_name as cannula_nurse_name,
+			nurn.real_name as create_user_name
+			from pip_nursing n
+			left join pip_drainage_record r on n.pip_use_record_id =  r.drainage_records_id
+			left join pip_piping p on r.piping_id = p.piping_id
+			left join pat_patient pat on n.patient_id =  pat.patient_id
+			left join nur_nurse nur on n.cannula_nurse_id = nur.nurse_id
+			left join nur_nurse nurn on n.create_user_id = nurn.nurse_id
+			<where>
+				n.del_flag = 0
+				<if test="nursing.patientId !=null">
+					and n.patient_id = #{nursing.patientId}
+				</if>
+			</where>
+		  order by n.id desc
+	</select>
+
+
+	<resultMap id="pipNursingMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.piping.NursingVo">
+		<id property="id" column="id"/>
+		<result property="pipNursingId" column="pip_nursing_id"/>
+		<result property="pipUseRecordId" column="pip_use_record_id"/>
+		<result property="pipingStartTime" column="piping_start_time"/>
+		<result property="cannulaNurseId" column="cannula_nurse_id"/>
+		<result property="preventiveMeasures" column="preventive_measures"/>
+		<result property="nursingOutcomes" column="nursing_outcomes"/>
+		<result property="causesOfDetachment" column="causes_of_detachment"/>
+		<result property="handle" column="handle"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="patientDynamics" column="patient_dynamics"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+
+		<result property="pipingName" column="piping_name"/>
+		<result property="cannulaNurseName" column="cannula_nurse_name"/>
+		<result property="patientName" column="pat_name"/>
+		<result property="nurseName" column="create_user_name"/>
+
+
+	</resultMap>
+
+
+  <resultMap id="pipNursingMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.piping.Nursing">
+                  <id property="id" column="id"/>
+                        <result property="pipNursingId" column="pip_nursing_id"/>
+                        <result property="pipUseRecordId" column="pip_use_record_id"/>
+                        <result property="pipingStartTime" column="piping_start_time"/>
+                        <result property="cannulaNurseId" column="cannula_nurse_id"/>
+                        <result property="preventiveMeasures" column="preventive_measures"/>
+                        <result property="nursingOutcomes" column="nursing_outcomes"/>
+                        <result property="causesOfDetachment" column="causes_of_detachment"/>
+                        <result property="handle" column="handle"/>
+	                    <result property="patientId" column="patient_id"/>
+                        <result property="patientDynamics" column="patient_dynamics"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delUserId" column="del_user_id"/>
+                        <result property="delTime" column="del_time"/>
+            </resultMap>
+</mapper>

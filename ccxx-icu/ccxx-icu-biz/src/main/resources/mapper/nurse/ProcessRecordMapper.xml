@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.nurse.ProcessRecordMapper">
+
+
+	<!-- 分页查询流程数据 -->
+	<select id="selectPaging" resultMap="nurProcessRecordMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.ProcessRecord">
+
+		select
+			r.id,
+			r.patient_id,
+			r.flow_name,
+			r.specific_step_id,
+			r.`status`,
+			r.start_time,
+			r.end_time,
+			r.create_user_id,
+			r.complete_nurse_id,
+			r.dept_id,
+			r.del_flag,
+			p.`name` as panme,
+			n.real_name as nname,
+			nur.real_name as nurname
+			from nur_process_record r
+			left join pat_patient p on r.patient_id = p.patient_id
+			left join nur_nurse n on r.create_user_id = n.nurse_id
+			left join nur_nurse nur on r.complete_nurse_id = n.user_id
+			<where>
+				r.del_flag = 0
+				<if test="nurProcessRecord.patientId !=null and nurProcessRecord.patientId != ''">
+					and r.patient_id = #{nurProcessRecord.patientId}
+				</if>
+				<if test="nurProcessRecord.deptId !=null and nurProcessRecord.deptId != ''">
+					and r.dept_id = #{nurProcessRecord.deptId}
+				</if>
+				<if test="nurProcessRecord.flowName !=null and nurProcessRecord.flowName != ''">
+					and r.flow_name = #{nurProcessRecord.flowName}
+				</if>
+			</where>
+		order by r.id desc
+
+	</select>
+
+	<!-- 分页查询流程数据 -->
+	<select id="selectAll" resultMap="nurProcessRecordMapVo" parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.ProcessRecord">
+
+		select
+		r.id,
+		r.patient_id,
+		r.flow_name,
+		r.specific_step_id,
+		r.`status`,
+		r.start_time,
+		r.end_time,
+		r.create_user_id,
+		r.complete_nurse_id,
+		r.dept_id,
+		r.del_flag,
+		p.`name` as panme,
+		n.real_name as nname,
+		nur.real_name as nurname
+		from nur_process_record r
+		left join pat_patient p on r.patient_id = p.patient_id
+		left join nur_nurse n on r.create_user_id = n.nurse_id
+		left join nur_nurse nur on r.complete_nurse_id = n.user_id
+		<where>
+			r.del_flag = 0
+			<if test="nurProcessRecord.patientId !=null and nurProcessRecord.patientId != ''">
+				and r.patient_id = #{nurProcessRecord.patientId}
+			</if>
+			<if test="nurProcessRecord.flowName !=null and nurProcessRecord.flowName != ''">
+				and r.flow_name = #{nurProcessRecord.flowName}
+			</if>
+			<if test="nurProcessRecord.deptId !=null and nurProcessRecord.deptId != ''">
+				and r.dept_id = #{nurProcessRecord.deptId}
+			</if>
+		</where>
+		order by r.id desc
+
+	</select>
+
+
+
+	<resultMap id="nurProcessRecordMapVo" type="com.pig4cloud.pigx.ccxxicu.api.vo.nurseVo.ProcessRecordVo">
+		<id property="id" column="id"/>
+		<result property="patientId" column="patient_id"/>
+		<result property="flowName" column="flow_name"/>
+		<result property="specificStepId" column="specific_step_id"/>
+		<result property="status" column="status"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="createUserId" column="create_user_id"/>
+		<result property="completeNurseId" column="complete_nurse_id"/>
+		<result property="deptId" column="dept_id"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="delTime" column="del_time"/>
+
+		<result property="patientName" column="panme"/>
+		<result property="createUserName" column="nname"/>
+		<result property="completeNurseName" column="nurname"/>
+
+	</resultMap>
+
+
+
+
+
+  <resultMap id="nurProcessRecordMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.nurse.ProcessRecord">
+                  <id property="id" column="id"/>
+                        <result property="patientId" column="patient_id"/>
+                        <result property="flowName" column="flow_name"/>
+                        <result property="specificStepId" column="specific_step_id"/>
+                        <result property="status" column="status"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="endTime" column="end_time"/>
+                        <result property="createUserId" column="create_user_id"/>
+                        <result property="completeNurseId" column="complete_nurse_id"/>
+                        <result property="deptId" column="dept_id"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="delTime" column="del_time"/>
+                        <result property="delUserId" column="del_user_id"/>
+            </resultMap>
+</mapper>

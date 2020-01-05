@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pigx.ccxxicu.mapper.newlogin.MacRfidUserRelationMapper">
+
+	<resultMap id="macRfidUserRelationMap" type="com.pig4cloud.pigx.ccxxicu.api.entity.newlogin.MacRfidUserRelation">
+		<id property="id" column="id"/>
+		<result property="macAddress" column="mac_address"/>
+		<result property="rfidId" column="rfid_id"/>
+		<result property="nurseName" column="nurse_name"/>
+		<result property="nurseId" column="nurse_id"/>
+		<result property="rfidTime" column="rfid_time"/>
+		<result property="terminalIntranetIp" column="terminal_intranet_ip"/>
+		<result property="rfidType" column="rfid_type"/>
+	</resultMap>
+
+	<!--mac地址查询-->
+	<select id="selectMacRfidUserRelationList" resultMap="macRfidUserRelationMap">
+		select * from mac_rfid_user_relation where rfid_time>=DATE_SUB(NOW(),INTERVAL 100 MINUTE);
+	</select>
+
+	<select id="selectMacList" resultMap="macRfidUserRelationMap">
+		select * from mac_rfid_user_relation;
+	</select>
+
+	<select id="selectRfidByIp" resultMap="macRfidUserRelationMap" parameterType="java.lang.String">
+		SELECT
+			*
+		FROM
+			mac_rfid_user_relation mru
+		WHERE
+			terminal_intranet_ip = #{terminalIntranetIp}
+		and
+			rfid_time >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+		ORDER BY
+			rfid_time DESC
+		LIMIT 1
+	</select>
+
+	<select id="selectRfidByIpAndType" resultMap="macRfidUserRelationMap" parameterType="java.lang.String">
+		SELECT
+			*
+		FROM
+			mac_rfid_user_relation mru
+		WHERE
+			terminal_intranet_ip = #{terminalIntranetIp}
+		and
+			rfid_time >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+		and
+			rfid_type = #{rfidType}
+		ORDER BY
+			rfid_time DESC
+		LIMIT 1
+	</select>
+
+	<insert id="insertMacRfidUserRelation" useGeneratedKeys="true" keyProperty="id"
+			parameterType="com.pig4cloud.pigx.ccxxicu.api.entity.newlogin.MacRfidUserRelation">
+		insert into mac_rfid_user_relation (id, mac_address, terminal_intranet_ip, rfid_id, nurse_name, nurse_id, rfid_time, rfid_type)
+		values (#{id, jdbcType=INTEGER}, #{macAddress, jdbcType=VARCHAR},
+		#{terminal_intranet_ip, jdbcType=VARCHAR}, #{rfid_id, jdbcType=VARCHAR},
+		#{nurse_name, jdbcType=VARCHAR}, #{nurse_id, jdbcType=VARCHAR},
+		#{rfid_time, jdbcType=VARCHAR}, #{rfid_type, jdbcType=VARCHAR})
+	</insert>
+
+</mapper>
